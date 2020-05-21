@@ -1,0 +1,8 @@
+{
+  "src/client/*.{pcss}": [
+    "npx stylelint \"src/client/**/*.pcss\""
+  ],
+  "src/wasm/*.{rs}": [
+    "cargo test"
+  ]
+}

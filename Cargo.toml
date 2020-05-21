@@ -1,0 +1,27 @@
+# You must change these to your own details.
+[package]
+name = "color-picker"
+description = "My super awesome Rust, WebAssembly, and Webpack project!"
+version = "0.1.0"
+authors = ["Evgeny Zhivitsa <evgeny.zhivitsa@gmail.com>"]
+categories = ["wasm"]
+readme = "README.md"
+edition = "2018"
+license = "MIT"
+repository = "https://github.com/ezhivitsa/color-picker"
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/wasm/lib.rs"
+
+[dependencies]
+yew = "0.16.2"
+
+# The `wasm-bindgen` crate provides the bare minimum functionality needed
+# to interact with JavaScript.
+wasm-bindgen = "0.2.62"
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. However, it is slower than the default
+# allocator, so it's not enabled by default.
+wee_alloc = { version = "0.4.2", optional = true }
