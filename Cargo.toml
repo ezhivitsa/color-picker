@@ -16,6 +16,7 @@ path = "src/wasm/lib.rs"
 
 [dependencies]
 yew = "0.16.2"
+serde = "1.0.110"
 
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.
@@ -24,4 +25,16 @@ wasm-bindgen = "0.2.62"
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. However, it is slower than the default
 # allocator, so it's not enabled by default.
-wee_alloc = { version = "0.4.2", optional = true }
+wee_alloc = { version = "0.4.5", optional = true }
+
+[profile.release]
+# less code to include into binary
+panic = 'abort' 
+# optimization over all codebase ( better optimization, slower build )
+codegen-units = 1
+# optimization for size ( more aggresive )
+opt-level = 'z' 
+# optimization for size 
+# opt-level = 's' 
+# link time optimization using using whole-program analysis
+lto = true

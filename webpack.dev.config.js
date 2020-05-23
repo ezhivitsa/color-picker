@@ -38,13 +38,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
-              modules: {
-                mode: 'local',
-                localIdentName: '[local]--[hash:base64:5]',
-                context: path.resolve(__dirname, 'src/client'),
-              },
-              localsConvention: 'dashesOnly',
+              importLoaders: 1
             },
           },
           'postcss-loader',

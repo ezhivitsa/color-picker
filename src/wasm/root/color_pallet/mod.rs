@@ -1,0 +1,65 @@
+use yew::{
+  Component,
+  ComponentLink,
+  ShouldRender,
+  Html,
+  html
+};
+use yew::agent::{
+  Dispatched,
+  Dispatcher,
+};
+
+use crate::agents::current_color_agent::{
+  CurrentColorAgent,
+  Request
+};
+
+pub struct ColorPallet {
+    link: ComponentLink<ColorPallet>,
+    event_bus: Dispatcher<CurrentColorAgent>,
+}
+
+pub enum Msg {
+    Clicked,
+}
+
+impl Component for ColorPallet {
+  type Message = Msg;
+  type Properties = ();
+
+  fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+    let mut event_bus = CurrentColorAgent::dispatcher();
+    event_bus.send(Request::CurrentColorMsg(30, 40));
+
+    ColorPallet { event_bus, link }
+  }
+
+  fn change(&mut self, _: Self::Properties) -> bool {
+    false
+  }
+
+  fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    match msg {
+      Msg::Clicked => {
+        self.event_bus
+          .send(Request::CurrentColorMsg(30, 60));
+        false
+      }
+    }
+  }
+
+  fn view(&self) -> Html {
+    html! {
+      <div class="colors__pallet">
+        <div class="pallet">
+          <button
+              onclick=self.link.callback(|_| Msg::Clicked)
+          >
+              {"PUSH ME"}
+          </button>
+        </div>
+      </div>
+    }
+  }
+}
