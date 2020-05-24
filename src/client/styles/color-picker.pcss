@@ -40,3 +40,34 @@
   bottom: 0;
   left: 0;
 }
+
+.values {
+  padding: var(--grid3) var(--grid4);
+}
+
+.hex-color {
+  border-radius: var(--border-radius-200);
+  border: 1px solid var(--color-grey-300);
+  position: relative;
+  padding: var(--grid2) 0;
+
+  &__title {
+    font-size: var(--font-size-300);
+    background: var(--color-white);
+    padding: 0 var(--grid1);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    font-size: var(--font-size-200);
+    text-align: center;
+    height: var(--grid4);
+  }
+}

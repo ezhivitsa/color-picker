@@ -28,7 +28,7 @@ impl Component for ColorValue {
     let _producer = CurrentColorAgent::bridge(callback);
 
     ColorValue {
-        color: "#ffffff".to_string(),
+        color: "".to_string(),
         _producer,
     }
   }

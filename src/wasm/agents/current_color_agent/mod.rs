@@ -2,16 +2,35 @@ use serde::{Deserialize, Serialize};
 use yew::worker::{Agent, AgentLink, HandlerId, Context};
 use std::collections::HashSet;
 
-use crate::libs::color_transform;
+use crate::libs::color_transform::Color;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
   CurrentColorMsg(i32, i32),
+  HexColorChangeMsg(String)
 }
 
 pub struct CurrentColorAgent {
+  color: Color,
   link: AgentLink<CurrentColorAgent>,
   subscribers: HashSet<HandlerId>,
+}
+
+impl CurrentColorAgent {
+  fn handle_current_color_change(&mut self, saturation: i32, value: i32) {
+    self.color = Color::from_hsv(50, saturation, value);
+    self.send_to_subscribers();
+  }
+
+  fn handle_hex_value_change(&mut self, value: String) {
+
+  }
+
+  fn send_to_subscribers(&mut self) {
+    for sub in self.subscribers.iter() {
+      self.link.respond(*sub, self.color.hex_value());
+    }
+  }
 }
 
 impl Agent for CurrentColorAgent {
@@ -21,7 +40,11 @@ impl Agent for CurrentColorAgent {
   type Output = String;
 
   fn create(link: AgentLink<Self>) -> Self {
+    // default color
+    let color = Color::from_hsv(50, 20, 40);
+
     CurrentColorAgent {
+        color,
         link,
         subscribers: HashSet::new(),
     }
@@ -32,18 +55,21 @@ impl Agent for CurrentColorAgent {
   fn handle_input(&mut self, msg: Self::Input, _: HandlerId) {
     match msg {
       Request::CurrentColorMsg(saturation, value) => {
-        let rgb = color_transform::hsv_to_rgb(50, saturation, value);
-        let hex = color_transform::rgb_to_hex(rgb.0, rgb.1, rgb.2);
+        self.handle_current_color_change(
+          saturation,
+          value
+        );
+      },
 
-        for sub in self.subscribers.iter() {
-          self.link.respond(*sub, hex.to_string());
-        }
+      Request::HexColorChangeMsg(hex) => {
+        self.handle_hex_value_change(hex);
       }
     }
   }
 
   fn connected(&mut self, id: HandlerId) {
     self.subscribers.insert(id);
+    self.link.respond(id, self.color.hex_value());
   }
 
   fn disconnected(&mut self, id: HandlerId) {

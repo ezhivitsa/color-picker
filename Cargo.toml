@@ -17,6 +17,8 @@ path = "src/wasm/lib.rs"
 [dependencies]
 yew = "0.16.2"
 serde = "1.0.110"
+regex = "1.3.7"
+lazy_static = "1.4.0"
 
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.

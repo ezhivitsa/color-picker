@@ -17,7 +17,7 @@ use crate::agents::current_color_agent::{
 
 pub struct ColorPallet {
     link: ComponentLink<ColorPallet>,
-    event_bus: Dispatcher<CurrentColorAgent>,
+    current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 pub enum Msg {
@@ -29,10 +29,9 @@ impl Component for ColorPallet {
   type Properties = ();
 
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-    let mut event_bus = CurrentColorAgent::dispatcher();
-    event_bus.send(Request::CurrentColorMsg(30, 40));
+    let current_color_agent = CurrentColorAgent::dispatcher();
 
-    ColorPallet { event_bus, link }
+    ColorPallet { current_color_agent, link }
   }
 
   fn change(&mut self, _: Self::Properties) -> bool {
@@ -42,8 +41,7 @@ impl Component for ColorPallet {
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::Clicked => {
-        self.event_bus
-          .send(Request::CurrentColorMsg(30, 60));
+        self.current_color_agent.send(Request::CurrentColorMsg(30, 60));
         false
       }
     }

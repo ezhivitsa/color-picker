@@ -8,6 +8,9 @@ use yew::prelude::*;
 
 use root::Root;
 
+#[macro_use]
+extern crate lazy_static;
+
 // When the `wee_alloc` feature is enabled, this uses `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]

@@ -1,5 +1,6 @@
 mod color_pallet;
 mod color_value;
+mod values;
 
 use yew::{Component, ComponentLink, ShouldRender, Html, html};
 
@@ -35,6 +36,8 @@ impl Component for Root {
                 <ColorValue />
                 <ColorPallet />
               </div>
+
+              {values::view()}
           </div>
       }
   }
