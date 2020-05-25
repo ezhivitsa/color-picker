@@ -1,11 +1,13 @@
 mod color_pallet;
 mod color_value;
 mod values;
+mod color_slider;
 
 use yew::{Component, ComponentLink, ShouldRender, Html, html};
 
 use color_pallet::ColorPallet;
 use color_value::ColorValue;
+use color_slider::ColorSlider;
 
 pub struct Root;
 
@@ -36,6 +38,8 @@ impl Component for Root {
                 <ColorValue />
                 <ColorPallet />
               </div>
+
+              <ColorSlider />
 
               {values::view()}
           </div>

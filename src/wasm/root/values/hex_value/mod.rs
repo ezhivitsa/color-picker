@@ -14,12 +14,13 @@ use yew::agent::{
 };
 use crate::agents::current_color_agent::{
   CurrentColorAgent,
-  Request
+  Request,
+  Response
 };
 
 
 pub enum Msg {
-  NewMessage(String),
+  NewMessage(Response),
   ValueChanged(InputData)
 }
 
@@ -60,8 +61,8 @@ impl Component for HexValue {
 
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
       match msg {
-          Msg::NewMessage(s) => {
-            self.color = s;
+          Msg::NewMessage(response) => {
+            self.color = response.hex;
             true
           },
           Msg::ValueChanged(e) => {

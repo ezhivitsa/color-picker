@@ -10,7 +10,7 @@ lazy_static! {
   static ref HEX_LONG: Regex = Regex::new(r"^#?([\dA-F]{2})([\dA-F]{2})([\dA-F]{2})$").unwrap();
 }
 
-struct HSV {
+pub struct HSV {
   hue: i32,
   saturation: i32,
   value: i32,
@@ -28,7 +28,7 @@ struct Hex {
 
 pub struct Color {
   hex: Hex,
-  hsv: HSV,
+  pub hsv: HSV,
   rgb: RGB
 }
 
@@ -49,6 +49,10 @@ impl HSV {
       value: 0
     }
   }
+
+  pub fn get_hue(&self) -> i32 {
+    self.hue
+  }
 }
 
 impl RGB {
@@ -61,8 +65,8 @@ impl RGB {
   }
 
   fn from_hsv(hsv: &HSV) -> RGB {
-    let s_norm = hsv.saturation as f32 / MAX_S;
-    let v_norm = hsv.value as f32 / MAX_V;
+    let s_norm = hsv.saturation as f32 / MAX_S as f32;
+    let v_norm = hsv.value as f32 / MAX_V as f32;
 
     if hsv.saturation == 0 {
       return RGB::values_to_rgb(v_norm, v_norm, v_norm);

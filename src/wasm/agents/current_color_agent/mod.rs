@@ -4,10 +4,35 @@ use std::collections::HashSet;
 
 use crate::libs::color_transform::Color;
 
+use crate::constants::{
+  MAX_S,
+  MAX_V
+};
+
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
   CurrentColorMsg(i32, i32),
   HexColorChangeMsg(String)
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Response {
+  pub hex: String,
+  pub top_right_corner: String
+}
+
+impl Response {
+  fn new(color: &Color) -> Response {
+    let top_right_color = Color::from_hsv(
+      color.hsv.get_hue(),
+      MAX_S,
+      MAX_V
+    );
+    Response {
+      hex: color.hex_value(),
+      top_right_corner: top_right_color.hex_value()
+    }
+  }
 }
 
 pub struct CurrentColorAgent {
@@ -28,7 +53,8 @@ impl CurrentColorAgent {
 
   fn send_to_subscribers(&mut self) {
     for sub in self.subscribers.iter() {
-      self.link.respond(*sub, self.color.hex_value());
+      let response = Response::new(&self.color);
+      self.link.respond(*sub, response);
     }
   }
 }
@@ -37,7 +63,7 @@ impl Agent for CurrentColorAgent {
   type Reach = Context;
   type Message = ();
   type Input = Request;
-  type Output = String;
+  type Output = Response;
 
   fn create(link: AgentLink<Self>) -> Self {
     // default color
@@ -69,7 +95,9 @@ impl Agent for CurrentColorAgent {
 
   fn connected(&mut self, id: HandlerId) {
     self.subscribers.insert(id);
-    self.link.respond(id, self.color.hex_value());
+
+    let initial_value = Response::new(&self.color);
+    self.link.respond(id, initial_value);
   }
 
   fn disconnected(&mut self, id: HandlerId) {

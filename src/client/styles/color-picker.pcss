@@ -71,3 +71,25 @@
     height: var(--grid4);
   }
 }
+
+.slider {
+  position: relative;
+  margin: var(--grid5);
+
+  &__hue {
+    background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%));
+    border-radius: var(--border-radius-300);
+    height: var(--grid2);
+  }
+
+  &__selector {
+    height: var(--grid5);
+    width: var(--grid5);
+    border: 2px solid var(--color-white);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: calc(var(--grid3) / -2 - 1px) 0 0 calc(var(--grid3) / -2 - 1px);
+  }
+}

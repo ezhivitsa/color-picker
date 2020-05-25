@@ -8,10 +8,13 @@ use yew::{
   Bridged
 };
 
-use crate::agents::current_color_agent::CurrentColorAgent;
+use crate::agents::current_color_agent::{
+  CurrentColorAgent,
+  Response
+};
 
 pub enum Msg {
-  NewMessage(String),
+  NewMessage(Response),
 }
 
 pub struct ColorValue {
@@ -39,7 +42,7 @@ impl Component for ColorValue {
 
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
       match msg {
-          Msg::NewMessage(s) => self.color = s,
+          Msg::NewMessage(response) => self.color = response.hex,
       }
       true
   }
