@@ -93,3 +93,37 @@
     margin: calc(var(--grid3) / -2 - 1px) 0 0 calc(var(--grid3) / -2 - 1px);
   }
 }
+
+.values-container {
+  display: flex;
+  margin: var(--grid3) calc(var(--grid1) * -1) 0;
+}
+
+.value-color {
+  flex: 1;
+  border-radius: var(--border-radius-200);
+  border: 1px solid var(--color-grey-300);
+  position: relative;
+  padding: var(--grid2) 0;
+  margin: 0 var(--grid1);
+
+  &__title {
+    font-size: var(--font-size-300);
+    background: var(--color-white);
+    padding: 0 var(--grid1);
+    position: absolute;
+    top: 0;
+    left: var(--grid2);
+    transform: translateY(-50%);
+  }
+
+  &__input {
+    display: block;
+    width: calc(100% - var(--grid6));
+    padding: 0 var(--grid3);
+    border: 0;
+    font-size: var(--font-size-200);
+    text-align: left;
+    height: var(--grid4);
+  }
+}

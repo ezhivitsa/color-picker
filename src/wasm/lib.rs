@@ -1,7 +1,7 @@
-mod root;
 mod agents;
-mod libs;
 mod constants;
+mod libs;
+mod root;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
@@ -19,5 +19,5 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen(start)]
 pub fn run_app() {
-    App::<Root>::new().mount_to_body();
+  App::<Root>::new().mount_to_body();
 }

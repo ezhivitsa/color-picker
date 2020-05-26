@@ -1,36 +1,41 @@
 use serde::{Deserialize, Serialize};
-use yew::worker::{Agent, AgentLink, HandlerId, Context};
 use std::collections::HashSet;
+use yew::worker::{Agent, AgentLink, Context, HandlerId};
 
 use crate::libs::color_transform::Color;
 
-use crate::constants::{
-  MAX_S,
-  MAX_V
-};
+use crate::constants::{MAX_S, MAX_V};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
   CurrentColorMsg(i32, i32),
-  HexColorChangeMsg(String)
+  HexColorChangeMsg(String),
+  RgbColorChangeMsg(String),
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Response {
   pub hex: String,
-  pub top_right_corner: String
+  pub rgb: String,
+  pub cmyk: String,
+  pub top_right_corner: String,
+  pub hue: i32,
+  pub saturation: i32,
+  pub value: i32,
 }
 
 impl Response {
   fn new(color: &Color) -> Response {
-    let top_right_color = Color::from_hsv(
-      color.hsv.get_hue(),
-      MAX_S,
-      MAX_V
-    );
+    let top_right_color = Color::from_hsv(color.hsv.get_hue(), MAX_S, MAX_V);
+
     Response {
       hex: color.hex_value(),
-      top_right_corner: top_right_color.hex_value()
+      rgb: color.rgb_value(),
+      cmyk: color.cmyk_value(),
+      top_right_corner: top_right_color.hex_value(),
+      hue: color.hsv.get_hue(),
+      saturation: color.hsv.get_saturation(),
+      value: color.hsv.get_value(),
     }
   }
 }
@@ -47,9 +52,7 @@ impl CurrentColorAgent {
     self.send_to_subscribers();
   }
 
-  fn handle_hex_value_change(&mut self, value: String) {
-
-  }
+  fn handle_hex_value_change(&mut self, value: String) {}
 
   fn send_to_subscribers(&mut self) {
     for sub in self.subscribers.iter() {
@@ -70,9 +73,9 @@ impl Agent for CurrentColorAgent {
     let color = Color::from_hsv(50, 20, 40);
 
     CurrentColorAgent {
-        color,
-        link,
-        subscribers: HashSet::new(),
+      color,
+      link,
+      subscribers: HashSet::new(),
     }
   }
 
@@ -81,15 +84,14 @@ impl Agent for CurrentColorAgent {
   fn handle_input(&mut self, msg: Self::Input, _: HandlerId) {
     match msg {
       Request::CurrentColorMsg(saturation, value) => {
-        self.handle_current_color_change(
-          saturation,
-          value
-        );
-      },
+        self.handle_current_color_change(saturation, value);
+      }
 
       Request::HexColorChangeMsg(hex) => {
         self.handle_hex_value_change(hex);
       }
+
+      Request::RgbColorChangeMsg(rgb) => {}
     }
   }
 

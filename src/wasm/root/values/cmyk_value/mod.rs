@@ -8,22 +8,22 @@ pub enum Msg {
   ValueChanged(InputData),
 }
 
-pub struct HexValue {
-  color: String,
-  link: ComponentLink<HexValue>,
+pub struct CmykValue {
+  cmyk_value: String,
+  link: ComponentLink<CmykValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
-impl HexValue {
+impl CmykValue {
   fn handle_value_change(&mut self, e: InputData) {
     self
       ._current_color_agent
-      .send(Request::HexColorChangeMsg(e.value));
+      .send(Request::RgbColorChangeMsg(e.value));
   }
 }
 
-impl Component for HexValue {
+impl Component for CmykValue {
   type Message = Msg;
   type Properties = ();
 
@@ -33,8 +33,8 @@ impl Component for HexValue {
     let _current_color_agent = CurrentColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
-    HexValue {
-      color: "".to_string(),
+    CmykValue {
+      cmyk_value: String::from(""),
       link,
       _producer,
       _current_color_agent,
@@ -48,7 +48,7 @@ impl Component for HexValue {
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::NewMessage(response) => {
-        self.color = response.hex;
+        self.cmyk_value = response.cmyk;
         true
       }
       Msg::ValueChanged(e) => {
@@ -60,13 +60,13 @@ impl Component for HexValue {
 
   fn view(&self) -> Html {
     html! {
-        <div class="hex-color">
-          <span class="hex-color__title">
-            {"HEX"}
+        <div class="value-color">
+          <span class="value-color__title">
+            {"CMYK"}
           </span>
           <input
-            class="hex-color__input"
-            value={&self.color}
+            class="value-color__input"
+            value={&self.cmyk_value}
             oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
           />
         </div>

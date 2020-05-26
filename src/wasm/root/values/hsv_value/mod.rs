@@ -8,22 +8,22 @@ pub enum Msg {
   ValueChanged(InputData),
 }
 
-pub struct HexValue {
+pub struct HsvValue {
   color: String,
-  link: ComponentLink<HexValue>,
+  link: ComponentLink<HsvValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
-impl HexValue {
+impl HsvValue {
   fn handle_value_change(&mut self, e: InputData) {
     self
       ._current_color_agent
-      .send(Request::HexColorChangeMsg(e.value));
+      .send(Request::RgbColorChangeMsg(e.value));
   }
 }
 
-impl Component for HexValue {
+impl Component for HsvValue {
   type Message = Msg;
   type Properties = ();
 
@@ -33,7 +33,7 @@ impl Component for HexValue {
     let _current_color_agent = CurrentColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
-    HexValue {
+    HsvValue {
       color: "".to_string(),
       link,
       _producer,
@@ -60,12 +60,12 @@ impl Component for HexValue {
 
   fn view(&self) -> Html {
     html! {
-        <div class="hex-color">
-          <span class="hex-color__title">
-            {"HEX"}
+        <div class="value-color">
+          <span class="value-color__title">
+            {"HSV"}
           </span>
           <input
-            class="hex-color__input"
+            class="value-color__input"
             value={&self.color}
             oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
           />

@@ -1,27 +1,15 @@
-use yew::{
-  Component,
-  ComponentLink,
-  ShouldRender,
-  Html,
-  html
-};
-use yew::agent::{
-  Dispatched,
-  Dispatcher,
-};
+use yew::agent::{Dispatched, Dispatcher};
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
-use crate::agents::current_color_agent::{
-  CurrentColorAgent,
-  Request
-};
+use crate::agents::current_color_agent::{CurrentColorAgent, Request};
 
 pub struct ColorPallet {
-    link: ComponentLink<ColorPallet>,
-    current_color_agent: Dispatcher<CurrentColorAgent>,
+  link: ComponentLink<ColorPallet>,
+  current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 pub enum Msg {
-    Clicked,
+  Clicked,
 }
 
 impl Component for ColorPallet {
@@ -31,7 +19,10 @@ impl Component for ColorPallet {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let current_color_agent = CurrentColorAgent::dispatcher();
 
-    ColorPallet { current_color_agent, link }
+    ColorPallet {
+      current_color_agent,
+      link,
+    }
   }
 
   fn change(&mut self, _: Self::Properties) -> bool {
@@ -41,7 +32,9 @@ impl Component for ColorPallet {
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::Clicked => {
-        self.current_color_agent.send(Request::CurrentColorMsg(30, 60));
+        self
+          .current_color_agent
+          .send(Request::CurrentColorMsg(30, 60));
         false
       }
     }

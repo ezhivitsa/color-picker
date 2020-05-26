@@ -1,17 +1,6 @@
-use yew::{
-  Component,
-  Bridge,
-  ComponentLink,
-  ShouldRender,
-  Html,
-  html,
-  Bridged
-};
+use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
-use crate::agents::current_color_agent::{
-  CurrentColorAgent,
-  Response
-};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
 
 pub enum Msg {
   NewMessage(Response),
@@ -31,8 +20,8 @@ impl Component for ColorValue {
     let _producer = CurrentColorAgent::bridge(callback);
 
     ColorValue {
-        color: "".to_string(),
-        _producer,
+      color: "".to_string(),
+      _producer,
     }
   }
 
@@ -41,20 +30,20 @@ impl Component for ColorValue {
   }
 
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
-      match msg {
-          Msg::NewMessage(response) => self.color = response.hex,
-      }
-      true
+    match msg {
+      Msg::NewMessage(response) => self.color = response.hex,
+    }
+    true
   }
 
   fn view(&self) -> Html {
-      html! {
-          <div
-            class="colors__current"
-            style=format!("background-color: {};", &self.color)
-          >
-            {&self.color}
-          </div>
-      }
+    html! {
+        <div
+          class="colors__current"
+          style=format!("background-color: {};", &self.color)
+        >
+          {&self.color}
+        </div>
+    }
   }
 }

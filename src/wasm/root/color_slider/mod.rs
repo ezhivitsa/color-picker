@@ -1,24 +1,16 @@
-use yew::{
-  Component,
-  ComponentLink,
-  Html,
-  html,
-  ShouldRender,
-  Bridge,
-  Bridged
-};
+use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
-use crate::agents::current_color_agent::{
-  CurrentColorAgent,
-  Response
-};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+
+use crate::constants::MAX_H;
 
 pub enum Msg {
-  CurrentColorMessage(Response)
+  CurrentColorMessage(Response),
 }
 
 pub struct ColorSlider {
   color: String,
+  hue: i32,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
 }
 
@@ -32,7 +24,8 @@ impl Component for ColorSlider {
 
     ColorSlider {
       color: "".to_string(),
-      _producer
+      hue: 0,
+      _producer,
     }
   }
 
@@ -44,18 +37,21 @@ impl Component for ColorSlider {
     match msg {
       Msg::CurrentColorMessage(response) => {
         self.color = response.top_right_corner;
+        self.hue = response.hue;
         true
       }
     }
   }
 
   fn view(&self) -> Html {
+    let left = self.hue as f32 / MAX_H * 100.0;
+
     html! {
       <div class="slider">
         <div class="slider__hue" />
         <div
           class="slider__selector"
-          style={format!("background-color: {}", self.color)}
+          style={format!("background-color: {}; left: {}%;", self.color, left)}
         />
       </div>
     }
