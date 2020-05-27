@@ -9,7 +9,7 @@ pub enum Msg {
 }
 
 pub struct HsvValue {
-  color: String,
+  hsv_value: String,
   link: ComponentLink<HsvValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
@@ -34,7 +34,7 @@ impl Component for HsvValue {
     let _producer = CurrentColorAgent::bridge(callback);
 
     HsvValue {
-      color: "".to_string(),
+      hsv_value: String::from(""),
       link,
       _producer,
       _current_color_agent,
@@ -48,7 +48,7 @@ impl Component for HsvValue {
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::NewMessage(response) => {
-        self.color = response.hex;
+        self.hsv_value = response.hsv;
         true
       }
       Msg::ValueChanged(e) => {
@@ -66,7 +66,7 @@ impl Component for HsvValue {
           </span>
           <input
             class="value-color__input"
-            value={&self.color}
+            value={&self.hsv_value}
             oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
           />
         </div>

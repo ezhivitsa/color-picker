@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::constants::{MAX_RGB, MAX_S, MAX_V, MAX_CMYK};
+use crate::constants::{MAX_CMYK, MAX_L, MAX_RGB, MAX_S, MAX_V};
 
 lazy_static! {
   static ref HEX_SHORT: Regex =
@@ -28,14 +28,21 @@ struct CMYK {
   black: i32,
   cyan: i32,
   magenta: i32,
-  yellow: i32
+  yellow: i32,
+}
+
+struct HSL {
+  hue: i32,
+  saturation: i32,
+  lightness: i32,
 }
 
 pub struct Color {
   hex: Hex,
-  pub hsv: HSV,
+  hsv: HSV,
   rgb: RGB,
-  cmyk: CMYK
+  cmyk: CMYK,
+  hsl: HSL,
 }
 
 impl HSV {
@@ -102,6 +109,10 @@ impl HSV {
 
   pub fn get_value(&self) -> i32 {
     self.value
+  }
+
+  pub fn to_string(&self) -> String {
+    format!("{}°, {}%, {}%", self.hue, self.saturation, self.value)
   }
 }
 
@@ -196,7 +207,14 @@ impl Hex {
   }
 
   pub fn to_string(&self) -> String {
-    let mut value = self.value.clone();
+    let mut value = if HEX_SHORT.is_match(&self.value) {
+      HEX_SHORT
+        .replace_all(&self.value, "#$r$r$g$g$b$b")
+        .to_string()
+    } else {
+      self.value.to_string()
+    };
+
     value.make_ascii_lowercase();
     value
   }
@@ -222,12 +240,46 @@ impl CMYK {
       black,
       cyan,
       magenta,
-      yellow
+      yellow,
     }
   }
 
   pub fn to_string(&self) -> String {
-    format!("{}%, {}%, {}%, {}%", self.cyan, self.magenta, self.yellow, self.black)
+    format!(
+      "{}%, {}%, {}%, {}%",
+      self.cyan, self.magenta, self.yellow, self.black
+    )
+  }
+}
+
+impl HSL {
+  pub fn from_hsv(hsv: &HSV) -> HSL {
+    let s_norm = hsv.saturation as f32 / MAX_S as f32;
+    let v_norm = hsv.value as f32 / MAX_V as f32;
+
+    let lightness: f32 = (2.0 - s_norm) * v_norm / 2.0;
+
+    let mut saturation: f32 = s_norm;
+
+    if lightness != 0.0 {
+      if lightness == 1.0 {
+        saturation = 0.0;
+      } else if lightness < 0.5 {
+        saturation = s_norm * v_norm / (lightness * 2.0);
+      } else {
+        saturation = s_norm * v_norm / (2.0 - lightness * 2.0);
+      }
+    }
+
+    HSL {
+      hue: hsv.hue,
+      saturation: (saturation * MAX_S as f32).round() as i32,
+      lightness: (lightness * MAX_L as f32).round() as i32,
+    }
+  }
+
+  pub fn to_string(&self) -> String {
+    format!("{}°, {}%, {}%", self.hue, self.saturation, self.lightness)
   }
 }
 
@@ -237,8 +289,15 @@ impl Color {
     let rgb = RGB::from_hsv(&hsv);
     let hex = Hex::from_rgb(&rgb);
     let cmyk = CMYK::from_rgb(&rgb);
+    let hsl = HSL::from_hsv(&hsv);
 
-    Color { hex, hsv, rgb, cmyk }
+    Color {
+      hex,
+      hsv,
+      rgb,
+      cmyk,
+      hsl,
+    }
   }
 
   pub fn from_hex(value: String) -> Color {
@@ -246,8 +305,27 @@ impl Color {
     let rgb = RGB::from_hex(&hex);
     let hsv = HSV::from_rgb(&rgb);
     let cmyk = CMYK::from_rgb(&rgb);
+    let hsl = HSL::from_hsv(&hsv);
 
-    Color { hex, rgb, hsv, cmyk }
+    Color {
+      hex,
+      rgb,
+      hsv,
+      cmyk,
+      hsl,
+    }
+  }
+
+  pub fn get_hue(&self) -> i32 {
+    self.hsv.hue
+  }
+
+  pub fn get_saturation(&self) -> i32 {
+    self.hsv.saturation
+  }
+
+  pub fn get_value(&self) -> i32 {
+    self.hsv.value
   }
 
   pub fn hex_value(&self) -> String {
@@ -260,5 +338,13 @@ impl Color {
 
   pub fn cmyk_value(&self) -> String {
     self.cmyk.to_string()
+  }
+
+  pub fn hsl_value(&self) -> String {
+    self.hsl.to_string()
+  }
+
+  pub fn hsv_value(&self) -> String {
+    self.hsv.to_string()
   }
 }

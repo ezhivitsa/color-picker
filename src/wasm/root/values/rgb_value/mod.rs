@@ -10,6 +10,8 @@ pub enum Msg {
 
 pub struct RgbValue {
   rgb_value: String,
+  last_rgb_value: String,
+  focused: bool,
   link: ComponentLink<RgbValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
@@ -17,6 +19,8 @@ pub struct RgbValue {
 
 impl RgbValue {
   fn handle_value_change(&mut self, e: InputData) {
+    self.rgb_value = e.value.to_string();
+
     self
       ._current_color_agent
       .send(Request::RgbColorChangeMsg(e.value));
@@ -35,6 +39,8 @@ impl Component for RgbValue {
 
     RgbValue {
       rgb_value: String::from(""),
+      last_rgb_value: String::from(""),
+      focused: false,
       link,
       _producer,
       _current_color_agent,
@@ -53,7 +59,7 @@ impl Component for RgbValue {
       }
       Msg::ValueChanged(e) => {
         self.handle_value_change(e);
-        false
+        true
       }
     }
   }

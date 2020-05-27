@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use yew::worker::{Agent, AgentLink, Context, HandlerId};
 
 use crate::libs::color_transform::Color;
+use crate::libs::color_validate;
 
 use crate::constants::{MAX_S, MAX_V};
 
@@ -18,6 +19,8 @@ pub struct Response {
   pub hex: String,
   pub rgb: String,
   pub cmyk: String,
+  pub hsl: String,
+  pub hsv: String,
   pub top_right_corner: String,
   pub hue: i32,
   pub saturation: i32,
@@ -26,16 +29,18 @@ pub struct Response {
 
 impl Response {
   fn new(color: &Color) -> Response {
-    let top_right_color = Color::from_hsv(color.hsv.get_hue(), MAX_S, MAX_V);
+    let top_right_color = Color::from_hsv(color.get_hue(), MAX_S, MAX_V);
 
     Response {
       hex: color.hex_value(),
       rgb: color.rgb_value(),
       cmyk: color.cmyk_value(),
+      hsl: color.hsl_value(),
+      hsv: color.hsv_value(),
       top_right_corner: top_right_color.hex_value(),
-      hue: color.hsv.get_hue(),
-      saturation: color.hsv.get_saturation(),
-      value: color.hsv.get_value(),
+      hue: color.get_hue(),
+      saturation: color.get_saturation(),
+      value: color.get_value(),
     }
   }
 }
@@ -52,7 +57,16 @@ impl CurrentColorAgent {
     self.send_to_subscribers();
   }
 
-  fn handle_hex_value_change(&mut self, value: String) {}
+  fn handle_hex_value_change(&mut self, value: String) {
+    if color_validate::is_valid_hex(&value) {
+      self.color = Color::from_hex(value);
+      self.send_to_subscribers();
+    }
+  }
+
+  fn handle_rgb_value_change(&mut self, value: String) {
+    
+  }
 
   fn send_to_subscribers(&mut self) {
     for sub in self.subscribers.iter() {
@@ -91,7 +105,9 @@ impl Agent for CurrentColorAgent {
         self.handle_hex_value_change(hex);
       }
 
-      Request::RgbColorChangeMsg(rgb) => {}
+      Request::RgbColorChangeMsg(rgb) => {
+        self.handle_rgb_value_change(rgb);
+      }
     }
   }
 
