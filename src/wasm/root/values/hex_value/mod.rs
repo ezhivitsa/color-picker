@@ -1,32 +1,27 @@
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use yew::agent::{Dispatched, Dispatcher};
-use yew::html::InputData;
-use yew::web_sys::FocusEvent;
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
+
+use crate::root::values::color_input::ColorInput;
 
 pub enum Msg {
   NewMessage(Response),
-  ValueChanged(InputData),
-  Blur,
-  Focus,
+  ValueChanged(String),
 }
 
 pub struct HexValue {
   hex_value: String,
   last_hex_value: String,
-  focused: bool,
   link: ComponentLink<HexValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl HexValue {
-  fn handle_value_change(&mut self, e: InputData) {
-    self.hex_value = e.value.to_string();
-
+  fn handle_value_change(&mut self, value: String) {
     self
       ._current_color_agent
-      .send(Request::HexColorChangeMsg(e.value));
+      .send(Request::HexColorChangeMsg(value));
   }
 }
 
@@ -43,14 +38,13 @@ impl Component for HexValue {
     HexValue {
       hex_value: String::from(""),
       last_hex_value: String::from(""),
-      focused: false,
       link,
       _producer,
       _current_color_agent,
     }
   }
 
-  fn change(&mut self, _: Self::Properties) -> bool {
+  fn change(&mut self, _: Self::Properties) -> ShouldRender {
     false
   }
 
@@ -59,24 +53,12 @@ impl Component for HexValue {
       Msg::NewMessage(response) => {
         self.hex_value = response.hex.to_string();
         self.last_hex_value = response.hex;
-
-        !self.focused
-      }
-
-      Msg::ValueChanged(e) => {
-        self.handle_value_change(e);
         true
       }
 
-      Msg::Blur => {
-        self.hex_value = self.last_hex_value.to_string();
-        self.focused = false;
+      Msg::ValueChanged(v) => {
+        self.handle_value_change(v);
         true
-      }
-
-      Msg::Focus => {
-        self.focused = true;
-        false
       }
     }
   }
@@ -87,12 +69,10 @@ impl Component for HexValue {
           <span class="hex-color__title">
             {"HEX"}
           </span>
-          <input
+          <ColorInput
             class="hex-color__input"
             value={&self.hex_value}
-            oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
-            onfocus={self.link.callback(|_: FocusEvent| Msg::Focus)}
-            onblur={self.link.callback(|_: FocusEvent| Msg::Blur)}
+            on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>
     }

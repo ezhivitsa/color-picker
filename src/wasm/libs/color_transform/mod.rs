@@ -3,9 +3,11 @@ use regex::Regex;
 use crate::constants::{MAX_CMYK, MAX_L, MAX_RGB, MAX_S, MAX_V};
 
 lazy_static! {
-  static ref HEX_SHORT: Regex =
+  static ref HEX_SHORT_REG_EXP: Regex =
     Regex::new(r"^#?(?P<r>[\dA-F])(?P<g>[\dA-F])(?P<b>[\dA-F])$").unwrap();
-  static ref HEX_LONG: Regex = Regex::new(r"^#?([\dA-F]{2})([\dA-F]{2})([\dA-F]{2})$").unwrap();
+  static ref HEX_LONG_REG_EXP: Regex =
+    Regex::new(r"^#?([\dA-F]{2})([\dA-F]{2})([\dA-F]{2})$").unwrap();
+  static ref RGB_REG_EXP: Regex = Regex::new(r"^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$").unwrap();
 }
 
 pub struct HSV {
@@ -117,6 +119,20 @@ impl HSV {
 }
 
 impl RGB {
+  pub fn new(value: String) -> RGB {
+    let mut red: i32 = 0;
+    let mut green: i32 = 0;
+    let mut blue: i32 = 0;
+
+    for cap in RGB_REG_EXP.captures_iter(&value) {
+      red = cap[1].parse::<i32>().unwrap();
+      green = cap[2].parse::<i32>().unwrap();
+      blue = cap[3].parse::<i32>().unwrap();
+    }
+
+    RGB { red, green, blue }
+  }
+
   fn values_to_rgb(r: f32, g: f32, b: f32) -> RGB {
     RGB {
       red: (r * 255.0).round() as i32,
@@ -156,8 +172,8 @@ impl RGB {
   }
 
   fn from_hex(hex: &Hex) -> RGB {
-    let mut hex_value = if HEX_SHORT.is_match(&hex.value) {
-      HEX_SHORT
+    let mut hex_value = if HEX_SHORT_REG_EXP.is_match(&hex.value) {
+      HEX_SHORT_REG_EXP
         .replace_all(&hex.value, "$r$r$g$g$b$b")
         .to_string()
     } else {
@@ -169,7 +185,7 @@ impl RGB {
     let mut green = 0;
     let mut blue = 0;
 
-    for cap in HEX_LONG.captures_iter(&hex_value) {
+    for cap in HEX_LONG_REG_EXP.captures_iter(&hex_value) {
       red = i32::from_str_radix(&cap[1], 16).unwrap();
       green = i32::from_str_radix(&cap[2], 16).unwrap();
       blue = i32::from_str_radix(&cap[3], 16).unwrap();
@@ -207,8 +223,8 @@ impl Hex {
   }
 
   pub fn to_string(&self) -> String {
-    let mut value = if HEX_SHORT.is_match(&self.value) {
-      HEX_SHORT
+    let mut value = if HEX_SHORT_REG_EXP.is_match(&self.value) {
+      HEX_SHORT_REG_EXP
         .replace_all(&self.value, "#$r$r$g$g$b$b")
         .to_string()
     } else {
@@ -315,6 +331,24 @@ impl Color {
       hsl,
     }
   }
+
+  pub fn from_rgb(value: String) -> Color {
+    let rgb = RGB::new(value);
+    let hex = Hex::from_rgb(&rgb);
+    let hsv = HSV::from_rgb(&rgb);
+    let cmyk = CMYK::from_rgb(&rgb);
+    let hsl = HSL::from_hsv(&hsv);
+
+    Color {
+      hex,
+      rgb,
+      hsv,
+      cmyk,
+      hsl,
+    }
+  }
+
+  pub fn from_cmyk(value: String) -> Color {}
 
   pub fn get_hue(&self) -> i32 {
     self.hsv.hue

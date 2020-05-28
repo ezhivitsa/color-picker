@@ -1,4 +1,5 @@
 mod cmyk_value;
+mod color_input;
 mod hex_value;
 mod hsl_value;
 mod hsv_value;

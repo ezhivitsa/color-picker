@@ -12,6 +12,7 @@ pub enum Request {
   CurrentColorMsg(i32, i32),
   HexColorChangeMsg(String),
   RgbColorChangeMsg(String),
+  CmykColorChangeMsg(String)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -65,7 +66,17 @@ impl CurrentColorAgent {
   }
 
   fn handle_rgb_value_change(&mut self, value: String) {
-    
+    if color_validate::is_valid_rgb(&value) {
+      self.color = Color::from_rgb(value);
+      self.send_to_subscribers();
+    }
+  }
+
+  fn handle_cmyk_value_change(&mut self, value: String) {
+    if color_validate::is_valid_cmyk(&value) {
+      self.color = Color::from_cmyk(value);
+      self.send_to_subscribers();
+    }
   }
 
   fn send_to_subscribers(&mut self) {
@@ -107,6 +118,10 @@ impl Agent for CurrentColorAgent {
 
       Request::RgbColorChangeMsg(rgb) => {
         self.handle_rgb_value_change(rgb);
+      }
+
+      Request::CmykColorChangeMsg(cmyk) => {
+        self.handle_cmyk_value_change(cmyk);
       }
     }
   }

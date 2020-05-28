@@ -1,29 +1,27 @@
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use yew::agent::{Dispatched, Dispatcher};
-use yew::html::InputData;
+
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
+
+use crate::root::values::color_input::ColorInput;
 
 pub enum Msg {
   NewMessage(Response),
-  ValueChanged(InputData),
+  ValueChanged(String),
 }
 
 pub struct RgbValue {
   rgb_value: String,
-  last_rgb_value: String,
-  focused: bool,
   link: ComponentLink<RgbValue>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl RgbValue {
-  fn handle_value_change(&mut self, e: InputData) {
-    self.rgb_value = e.value.to_string();
-
+  fn handle_value_change(&mut self, value: String) {
     self
       ._current_color_agent
-      .send(Request::RgbColorChangeMsg(e.value));
+      .send(Request::RgbColorChangeMsg(value));
   }
 }
 
@@ -39,8 +37,6 @@ impl Component for RgbValue {
 
     RgbValue {
       rgb_value: String::from(""),
-      last_rgb_value: String::from(""),
-      focused: false,
       link,
       _producer,
       _current_color_agent,
@@ -57,8 +53,8 @@ impl Component for RgbValue {
         self.rgb_value = response.rgb;
         true
       }
-      Msg::ValueChanged(e) => {
-        self.handle_value_change(e);
+      Msg::ValueChanged(v) => {
+        self.handle_value_change(v);
         true
       }
     }
@@ -70,10 +66,10 @@ impl Component for RgbValue {
           <span class="value-color__title">
             {"RGB"}
           </span>
-          <input
+          <ColorInput
             class="value-color__input"
             value={&self.rgb_value}
-            oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
+            on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>
     }

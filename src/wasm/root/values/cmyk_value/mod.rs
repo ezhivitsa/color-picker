@@ -1,11 +1,12 @@
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use yew::agent::{Dispatched, Dispatcher};
-use yew::html::InputData;
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
+
+use crate::root::values::color_input::ColorInput;
 
 pub enum Msg {
   NewMessage(Response),
-  ValueChanged(InputData),
+  ValueChanged(String),
 }
 
 pub struct CmykValue {
@@ -16,10 +17,10 @@ pub struct CmykValue {
 }
 
 impl CmykValue {
-  fn handle_value_change(&mut self, e: InputData) {
+  fn handle_value_change(&mut self, value: String) {
     self
       ._current_color_agent
-      .send(Request::RgbColorChangeMsg(e.value));
+      .send(Request::CmykColorChangeMsg(value));
   }
 }
 
@@ -41,7 +42,7 @@ impl Component for CmykValue {
     }
   }
 
-  fn change(&mut self, _: Self::Properties) -> bool {
+  fn change(&mut self, _: Self::Properties) -> ShouldRender {
     false
   }
 
@@ -51,9 +52,9 @@ impl Component for CmykValue {
         self.cmyk_value = response.cmyk;
         true
       }
-      Msg::ValueChanged(e) => {
-        self.handle_value_change(e);
-        false
+      Msg::ValueChanged(value) => {
+        self.handle_value_change(value);
+        true
       }
     }
   }
@@ -64,10 +65,10 @@ impl Component for CmykValue {
           <span class="value-color__title">
             {"CMYK"}
           </span>
-          <input
+          <ColorInput
             class="value-color__input"
             value={&self.cmyk_value}
-            oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
+            on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>
     }
