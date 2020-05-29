@@ -1,6 +1,6 @@
 use regex::{Regex, RegexSet};
 
-use crate::constants::{MAX_CMYK, MAX_RGB, MIN_CMYK, MIN_RGB};
+use crate::constants::{MAX_CMYK, MAX_RGB, MIN_CMYK, MIN_RGB, MIN_HSV, MAX_H, MAX_SVL};
 
 lazy_static! {
   static ref HEX: RegexSet =
@@ -8,6 +8,7 @@ lazy_static! {
   static ref RGB: Regex = Regex::new(r"^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$").unwrap();
   static ref CMYK: Regex =
     Regex::new(r"^(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%$").unwrap();
+  static ref HSV: Regex = Regex::new(r"(\d{1,3})°,\s*(\d{1,3})%,\s*(\d{1,3})%").unwrap();
 }
 
 pub fn is_valid_hex(hex: &str) -> bool {
@@ -47,7 +48,7 @@ pub fn is_valid_cmyk(cmyk: &str) -> bool {
   let mut yellow: i32 = -1;
   let mut key: i32 = -1;
 
-  for cap in RGB.captures_iter(&cmyk) {
+  for cap in CMYK.captures_iter(&cmyk) {
     cyan = cap[1].parse::<i32>().unwrap();
     magenta = cap[2].parse::<i32>().unwrap();
     yellow = cap[3].parse::<i32>().unwrap();
@@ -62,4 +63,27 @@ pub fn is_valid_cmyk(cmyk: &str) -> bool {
     && yellow <= MAX_CMYK
     && MIN_CMYK <= key
     && key <= MAX_CMYK;
+}
+
+pub fn is_valid_hsv(hsv: &str) -> bool {
+  if !HSV.is_match(hsv) {
+    return false;
+  }
+
+  let mut hue: i32 = -1;
+  let mut saturation: i32 = -1;
+  let mut value: i32 = -1;
+
+  for cap in HSV.captures_iter(&hsv) {
+    hue = cap[1].parse::<i32>().unwrap();
+    saturation = cap[2].parse::<i32>().unwrap();
+    value = cap[3].parse::<i32>().unwrap();
+  }
+
+  return MIN_HSV <= hue
+    && hue <= MAX_H
+    && MIN_HSV <= saturation
+    && saturation <= MAX_SVL
+    && MIN_HSV <= value
+    && value <= MAX_SVL;
 }

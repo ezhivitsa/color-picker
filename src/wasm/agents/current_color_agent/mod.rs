@@ -5,14 +5,16 @@ use yew::worker::{Agent, AgentLink, Context, HandlerId};
 use crate::libs::color_transform::Color;
 use crate::libs::color_validate;
 
-use crate::constants::{MAX_S, MAX_V};
+use crate::constants::{MAX_SVL};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
   CurrentColorMsg(i32, i32),
   HexColorChangeMsg(String),
   RgbColorChangeMsg(String),
-  CmykColorChangeMsg(String)
+  CmykColorChangeMsg(String),
+  HsvColorChangeMsg(String),
+  HslColorChangeMsg(String)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -30,7 +32,7 @@ pub struct Response {
 
 impl Response {
   fn new(color: &Color) -> Response {
-    let top_right_color = Color::from_hsv(color.get_hue(), MAX_S, MAX_V);
+    let top_right_color = Color::from_hsv_values(color.get_hue(), MAX_SVL, MAX_SVL);
 
     Response {
       hex: color.hex_value(),
@@ -54,7 +56,7 @@ pub struct CurrentColorAgent {
 
 impl CurrentColorAgent {
   fn handle_current_color_change(&mut self, saturation: i32, value: i32) {
-    self.color = Color::from_hsv(50, saturation, value);
+    self.color = Color::from_hsv_values(50, saturation, value);
     self.send_to_subscribers();
   }
 
@@ -79,6 +81,20 @@ impl CurrentColorAgent {
     }
   }
 
+  fn handle_hsv_value_change(&mut self, value: String) {
+    if color_validate::is_valid_hsv(&value) {
+      self.color = Color::from_hsv(value);
+      self.send_to_subscribers();
+    }
+  }
+
+  fn handle_hsl_value_change(&mut self, value: String) {
+    if color_validate::is_valid_hsv(&value) {
+      self.color = Color::from_hsl(value);
+      self.send_to_subscribers();
+    }
+  }
+
   fn send_to_subscribers(&mut self) {
     for sub in self.subscribers.iter() {
       let response = Response::new(&self.color);
@@ -95,7 +111,7 @@ impl Agent for CurrentColorAgent {
 
   fn create(link: AgentLink<Self>) -> Self {
     // default color
-    let color = Color::from_hsv(50, 20, 40);
+    let color = Color::from_hsv_values(50, 20, 40);
 
     CurrentColorAgent {
       color,
@@ -122,6 +138,14 @@ impl Agent for CurrentColorAgent {
 
       Request::CmykColorChangeMsg(cmyk) => {
         self.handle_cmyk_value_change(cmyk);
+      }
+
+      Request::HsvColorChangeMsg(hsv) => {
+        self.handle_hsv_value_change(hsv);
+      }
+
+      Request::HslColorChangeMsg(hsl) => {
+        self.handle_hsl_value_change(hsl);
       }
     }
   }

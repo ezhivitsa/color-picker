@@ -44,7 +44,7 @@ impl Component for ColorSlider {
   }
 
   fn view(&self) -> Html {
-    let left = self.hue as f32 / MAX_H * 100.0;
+    let left = self.hue as f32 / MAX_H as f32 * 100.0;
 
     html! {
       <div class="slider">

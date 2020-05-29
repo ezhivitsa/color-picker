@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::constants::{MAX_CMYK, MAX_L, MAX_RGB, MAX_S, MAX_V};
+use crate::constants::{MAX_CMYK, MAX_SVL, MAX_RGB};
 
 lazy_static! {
   static ref HEX_SHORT_REG_EXP: Regex =
@@ -8,6 +8,9 @@ lazy_static! {
   static ref HEX_LONG_REG_EXP: Regex =
     Regex::new(r"^#?([\dA-F]{2})([\dA-F]{2})([\dA-F]{2})$").unwrap();
   static ref RGB_REG_EXP: Regex = Regex::new(r"^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$").unwrap();
+  static ref CMYK_REG_EXP: Regex =
+    Regex::new(r"^(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%$").unwrap();
+  static ref HSV_REG_EXP: Regex = Regex::new(r"(\d{1,3})°,\s*(\d{1,3})%,\s*(\d{1,3})%").unwrap();
 }
 
 pub struct HSV {
@@ -16,17 +19,17 @@ pub struct HSV {
   value: i32,
 }
 
-struct RGB {
+pub struct RGB {
   red: i32,
   green: i32,
   blue: i32,
 }
 
-struct Hex {
+pub struct Hex {
   value: String,
 }
 
-struct CMYK {
+pub struct CMYK {
   black: i32,
   cyan: i32,
   magenta: i32,
@@ -48,8 +51,26 @@ pub struct Color {
 }
 
 impl HSV {
+  pub fn new(hsv: String) -> HSV {
+    let mut hue: i32 = 0;
+    let mut saturation: i32 = 0;
+    let mut value: i32 = 0;
+
+    for cap in HSV_REG_EXP.captures_iter(&hsv) {
+      hue = cap[1].parse::<i32>().unwrap();
+      saturation = cap[2].parse::<i32>().unwrap();
+      value = cap[3].parse::<i32>().unwrap();
+    }
+
+    HSV {
+      hue,
+      saturation,
+      value
+    }
+  }
+
   // h = [0,360], s = [0,100], v = [0,100]
-  fn new(h: i32, s: i32, v: i32) -> HSV {
+  pub fn from_values(h: i32, s: i32, v: i32) -> HSV {
     HSV {
       hue: h,
       saturation: s,
@@ -57,7 +78,7 @@ impl HSV {
     }
   }
 
-  fn from_rgb(rgb: &RGB) -> HSV {
+  pub fn from_rgb(rgb: &RGB) -> HSV {
     let r_norm = rgb.red as f32 / MAX_RGB as f32;
     let g_norm = rgb.green as f32 / MAX_RGB as f32;
     let b_norm = rgb.blue as f32 / MAX_RGB as f32;
@@ -101,6 +122,8 @@ impl HSV {
     }
   }
 
+  pub fn from_hsl(hsl: &HSL) -> HSV {}
+
   pub fn get_hue(&self) -> i32 {
     self.hue
   }
@@ -133,6 +156,23 @@ impl RGB {
     RGB { red, green, blue }
   }
 
+  pub fn from_cmyk(cmyk: &CMYK) -> RGB {
+    let c_norm: f32 = cmyk.cyan as f32 / MAX_CMYK as f32;
+    let m_norm: f32 = cmyk.magenta as f32 / MAX_CMYK as f32;
+    let y_norm: f32 = cmyk.yellow as f32 / MAX_CMYK as f32;
+    let k_norm: f32 = cmyk.black as f32 / MAX_CMYK as f32;
+
+    let red = (1.0 - c_norm) * (1.0 - k_norm);
+    let green = (1.0 - m_norm) * (1.0 - k_norm);
+    let blue = (1.0 - y_norm) * (1.0 - k_norm);
+
+    RGB {
+      red: (red * MAX_RGB as f32).round() as i32,
+      green: (green * MAX_RGB as f32).round() as i32,
+      blue: (blue * MAX_RGB as f32).round() as i32
+    }
+  }
+
   fn values_to_rgb(r: f32, g: f32, b: f32) -> RGB {
     RGB {
       red: (r * 255.0).round() as i32,
@@ -142,8 +182,8 @@ impl RGB {
   }
 
   fn from_hsv(hsv: &HSV) -> RGB {
-    let s_norm = hsv.saturation as f32 / MAX_S as f32;
-    let v_norm = hsv.value as f32 / MAX_V as f32;
+    let s_norm = hsv.saturation as f32 / MAX_SVL as f32;
+    let v_norm = hsv.value as f32 / MAX_SVL as f32;
 
     if hsv.saturation == 0 {
       return RGB::values_to_rgb(v_norm, v_norm, v_norm);
@@ -237,6 +277,27 @@ impl Hex {
 }
 
 impl CMYK {
+  pub fn new(value: String) -> CMYK {
+    let mut cyan: i32 = 0;
+    let mut magenta: i32 = 0;
+    let mut yellow: i32 = 0;
+    let mut black: i32 = 0;
+
+    for cap in CMYK_REG_EXP.captures_iter(&value) {
+      cyan = cap[1].parse::<i32>().unwrap();
+      magenta = cap[2].parse::<i32>().unwrap();
+      yellow = cap[3].parse::<i32>().unwrap();
+      black = cap[4].parse::<i32>().unwrap();
+    }
+
+    CMYK {
+      cyan,
+      magenta,
+      yellow,
+      black
+    }
+  }
+
   pub fn from_rgb(rgb: &RGB) -> CMYK {
     let r_norm = rgb.red as f32 / MAX_RGB as f32;
     let g_norm = rgb.green as f32 / MAX_RGB as f32;
@@ -269,9 +330,27 @@ impl CMYK {
 }
 
 impl HSL {
+  pub fn new(hsl: String) -> HSL {
+    let mut hue: i32 = 0;
+    let mut saturation: i32 = 0;
+    let mut lightness: i32 = 0;
+
+    for cap in HSV_REG_EXP.captures_iter(&hsl) {
+      hue = cap[1].parse::<i32>().unwrap();
+      saturation = cap[2].parse::<i32>().unwrap();
+      lightness = cap[3].parse::<i32>().unwrap();
+    }
+
+    HSL {
+      hue,
+      saturation,
+      lightness
+    }
+  }
+
   pub fn from_hsv(hsv: &HSV) -> HSL {
-    let s_norm = hsv.saturation as f32 / MAX_S as f32;
-    let v_norm = hsv.value as f32 / MAX_V as f32;
+    let s_norm = hsv.saturation as f32 / MAX_SVL as f32;
+    let v_norm = hsv.value as f32 / MAX_SVL as f32;
 
     let lightness: f32 = (2.0 - s_norm) * v_norm / 2.0;
 
@@ -289,8 +368,8 @@ impl HSL {
 
     HSL {
       hue: hsv.hue,
-      saturation: (saturation * MAX_S as f32).round() as i32,
-      lightness: (lightness * MAX_L as f32).round() as i32,
+      saturation: (saturation * MAX_SVL as f32).round() as i32,
+      lightness: (lightness * MAX_SVL as f32).round() as i32,
     }
   }
 
@@ -300,8 +379,8 @@ impl HSL {
 }
 
 impl Color {
-  pub fn from_hsv(h: i32, s: i32, v: i32) -> Color {
-    let hsv = HSV::new(h, s, v);
+  pub fn from_hsv_values(h: i32, s: i32, v: i32) -> Color {
+    let hsv = HSV::from_values(h, s, v);
     let rgb = RGB::from_hsv(&hsv);
     let hex = Hex::from_rgb(&rgb);
     let cmyk = CMYK::from_rgb(&rgb);
@@ -348,7 +427,53 @@ impl Color {
     }
   }
 
-  pub fn from_cmyk(value: String) -> Color {}
+  pub fn from_cmyk(value: String) -> Color {
+    let cmyk = CMYK::new(value);
+    let rgb = RGB::from_cmyk(&cmyk);
+    let hex = Hex::from_rgb(&rgb);
+    let hsv = HSV::from_rgb(&rgb);
+    let hsl = HSL::from_hsv(&hsv);
+
+    Color {
+      hex,
+      rgb,
+      hsv,
+      cmyk,
+      hsl,
+    }
+  }
+
+  pub fn from_hsv(value: String) -> Color {
+    let hsv = HSV::new(value);
+    let rgb = RGB::from_hsv(&hsv);
+    let hex = Hex::from_rgb(&rgb);
+    let cmyk = CMYK::from_rgb(&rgb);
+    let hsl = HSL::from_hsv(&hsv);
+
+    Color {
+      hex,
+      hsv,
+      rgb,
+      cmyk,
+      hsl,
+    }
+  }
+
+  pub fn from_hsl(value: String) -> Color {
+    let hsl = HSL::new(value);
+    let hsv = HSV::from_hsl(value);
+    let rgb = RGB::from_hsv(&hsv);
+    let hex = Hex::from_rgb(&rgb);
+    let cmyk = CMYK::from_rgb(&rgb);
+
+    Color {
+      hex,
+      hsv,
+      rgb,
+      cmyk,
+      hsl,
+    }
+  }
 
   pub fn get_hue(&self) -> i32 {
     self.hsv.hue

@@ -1,11 +1,12 @@
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use yew::agent::{Dispatched, Dispatcher};
-use yew::html::InputData;
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
+
+use crate::root::values::color_input::ColorInput;
 
 pub enum Msg {
   NewMessage(Response),
-  ValueChanged(InputData),
+  ValueChanged(String),
 }
 
 pub struct HsvValue {
@@ -16,10 +17,10 @@ pub struct HsvValue {
 }
 
 impl HsvValue {
-  fn handle_value_change(&mut self, e: InputData) {
+  fn handle_value_change(&mut self, value: String) {
     self
       ._current_color_agent
-      .send(Request::RgbColorChangeMsg(e.value));
+      .send(Request::HsvColorChangeMsg(value));
   }
 }
 
@@ -51,8 +52,8 @@ impl Component for HsvValue {
         self.hsv_value = response.hsv;
         true
       }
-      Msg::ValueChanged(e) => {
-        self.handle_value_change(e);
+      Msg::ValueChanged(value) => {
+        self.handle_value_change(value);
         false
       }
     }
@@ -64,10 +65,10 @@ impl Component for HsvValue {
           <span class="value-color__title">
             {"HSV"}
           </span>
-          <input
+          <ColorInput
             class="value-color__input"
             value={&self.hsv_value}
-            oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
+            on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>
     }

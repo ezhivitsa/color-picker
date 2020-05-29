@@ -41,9 +41,7 @@ impl Component for ColorValue {
         <div
           class="colors__current"
           style=format!("background-color: {};", &self.color)
-        >
-          {&self.color}
-        </div>
+        />
     }
   }
 }
