@@ -36,7 +36,7 @@ pub struct CMYK {
   yellow: i32,
 }
 
-struct HSL {
+pub struct HSL {
   hue: i32,
   saturation: i32,
   lightness: i32,
@@ -122,7 +122,26 @@ impl HSV {
     }
   }
 
-  pub fn from_hsl(hsl: &HSL) -> HSV {}
+  pub fn from_hsl(hsl: &HSL) -> HSV {
+    let h = hsl.hue;
+
+    let l_norm = hsl.lightness as f32 * 2.0 / MAX_SVL as f32;
+    let mut s_norm = hsl.saturation as f32 / MAX_SVL as f32;
+    if l_norm <= 1.0 {
+      s_norm *= l_norm;
+    } else {
+      s_norm *= 2.0 - l_norm;
+    }
+    
+    let v = (l_norm + s_norm) / 2.0;
+    let s = (2.0 * s_norm) / (l_norm + s_norm);
+
+    HSV {
+      hue: h,
+      saturation: (s * MAX_SVL as f32).round() as i32,
+      value: (v * MAX_SVL as f32).round() as i32
+    }
+  }
 
   pub fn get_hue(&self) -> i32 {
     self.hue
@@ -195,8 +214,8 @@ impl RGB {
     let p: f32 = v_norm * (1.0 - s_norm);
     let q: f32 = v_norm * (1.0 - s_norm * f);
     let t: f32 = v_norm * (1.0 - s_norm * (1.0 - f));
-
-    if i == 0.0 {
+    
+    if i == 0.0 || i == 6.0 {
       return RGB::values_to_rgb(v_norm, t, p);
     } else if i == 1.0 {
       return RGB::values_to_rgb(q, v_norm, p);
@@ -461,7 +480,7 @@ impl Color {
 
   pub fn from_hsl(value: String) -> Color {
     let hsl = HSL::new(value);
-    let hsv = HSV::from_hsl(value);
+    let hsv = HSV::from_hsl(&hsl);
     let rgb = RGB::from_hsv(&hsv);
     let hex = Hex::from_rgb(&rgb);
     let cmyk = CMYK::from_rgb(&rgb);

@@ -2,6 +2,7 @@ mod agents;
 mod constants;
 mod libs;
 mod root;
+mod services;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;

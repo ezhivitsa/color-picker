@@ -9,6 +9,7 @@ use crate::constants::{MAX_SVL};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
+  CurrentHueMsg(i32),
   CurrentColorMsg(i32, i32),
   HexColorChangeMsg(String),
   RgbColorChangeMsg(String),
@@ -55,8 +56,17 @@ pub struct CurrentColorAgent {
 }
 
 impl CurrentColorAgent {
+  fn handle_current_hue_change(&mut self, hue: i32) {
+    self.color = Color::from_hsv_values(
+      hue,
+      self.color.get_saturation(),
+      self.color.get_value()
+    );
+    self.send_to_subscribers();
+  }
+
   fn handle_current_color_change(&mut self, saturation: i32, value: i32) {
-    self.color = Color::from_hsv_values(50, saturation, value);
+    self.color = Color::from_hsv_values(self.color.get_hue(), saturation, value);
     self.send_to_subscribers();
   }
 
@@ -124,6 +134,10 @@ impl Agent for CurrentColorAgent {
 
   fn handle_input(&mut self, msg: Self::Input, _: HandlerId) {
     match msg {
+      Request::CurrentHueMsg(hue) => {
+        self.handle_current_hue_change(hue);
+      }
+
       Request::CurrentColorMsg(saturation, value) => {
         self.handle_current_color_change(saturation, value);
       }

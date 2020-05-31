@@ -77,11 +77,13 @@ checksum = "8100e46ff92eb85bf6dc2930c73f2a4f7176393c84a9446b3d501e1b354e7b34"
 name = "color-picker"
 version = "0.1.0"
 dependencies = [
+ "gloo",
  "lazy_static",
  "rand",
  "regex",
  "serde",
  "wasm-bindgen",
+ "web-sys",
  "wee_alloc",
  "yew",
 ]
@@ -664,9 +666,9 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "yew"
-version = "0.16.2"
+version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc1e1b60b090bf29758c6c42da2d2d6d54aa97dc73e3ccd1cd99d664b4c754cf"
+checksum = "2e48bc6b264e30362e5d420cd6aa2cd24dd4c9131284bc24afc0a41c28c125f3"
 dependencies = [
  "anyhow",
  "anymap",
@@ -695,9 +697,9 @@ dependencies = [
 
 [[package]]
 name = "yew-macro"
-version = "0.16.1"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1d2fe46d7922ecd99af4e5b4eddcab58c70ec741e31de6e1b910d5873a3095f"
+checksum = "074c652331c32cf6431b0c5c4b6cb6fbb2168a1be6022e51b32c95fefb70153c"
 dependencies = [
  "boolinator",
  "lazy_static",
