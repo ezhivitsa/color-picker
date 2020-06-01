@@ -1,11 +1,9 @@
-use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender, NodeRef};
-use web_sys::{MouseEvent,HtmlElement};
+use web_sys::{HtmlElement, MouseEvent};
 use yew::agent::{Dispatched, Dispatcher};
+use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, ShouldRender};
 
-use yew::utils::document;
-
-use crate::agents::current_color_agent::{CurrentColorAgent, Response, Request};
-use crate::services::mouse_move::{MouseService, MouseTask};
+use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::services::mouse::{MouseService, MouseTask};
 
 use crate::constants::MAX_H;
 
@@ -14,30 +12,26 @@ pub enum Msg {
   MouseDown(MouseEvent),
   MouseMove(MouseEvent),
   MouseUp(MouseEvent),
-  MouseOut(MouseEvent)
+  MouseOut(MouseEvent),
 }
 
 struct Tasks {
   _mouse_move: MouseTask,
   _mouse_up: MouseTask,
-  _mouse_out: MouseTask
+  _mouse_out: MouseTask,
 }
 
 struct SliderData {
   hue: i32,
-  start: i32
+  start: i32,
 }
 
 impl Tasks {
-  fn new(
-    _mouse_move: MouseTask,
-    _mouse_up: MouseTask,
-    _mouse_out: MouseTask
-  ) -> Tasks {
+  fn new(_mouse_move: MouseTask, _mouse_up: MouseTask, _mouse_out: MouseTask) -> Tasks {
     Tasks {
       _mouse_move,
       _mouse_up,
-      _mouse_out
+      _mouse_out,
     }
   }
 }
@@ -50,21 +44,25 @@ pub struct ColorSlider {
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   start_data: Option<SliderData>,
   _tasks: Tasks,
-  slider_ref: NodeRef
+  slider_ref: NodeRef,
 }
 
 impl ColorSlider {
   fn handle_mouse_down(&mut self, event: MouseEvent) {
     self.start_data = Some(SliderData {
       start: event.screen_x(),
-      hue: self.hue
+      hue: self.hue,
     });
   }
 
   fn handle_mouse_move(&mut self, event: MouseEvent) {
     if let Some(start_data) = &self.start_data {
       let diff = event.screen_x() - start_data.start;
-      let slider_width = self.slider_ref.cast::<HtmlElement>().unwrap().offset_width();
+      let slider_width = self
+        .slider_ref
+        .cast::<HtmlElement>()
+        .unwrap()
+        .offset_width();
 
       let hue_diff = diff as f32 / slider_width as f32 * MAX_H as f32;
       let hue_diff = hue_diff.round() as i32;
@@ -72,17 +70,11 @@ impl ColorSlider {
       let hue = start_data.hue + hue_diff;
       let hue = (hue.max(0)).min(MAX_H);
 
-      self
-          .current_color_agent
-          .send(Request::CurrentHueMsg(hue));
+      self.current_color_agent.send(Request::CurrentHueMsg(hue));
     }
   }
 
   fn handle_mouse_up(&mut self, _: MouseEvent) {
-    self.start_data = None;
-  }
-
-  fn handle_mouse_out(&mut self, _: MouseEvent) {
     self.start_data = None;
   }
 }
@@ -100,25 +92,12 @@ impl Component for ColorSlider {
     let move_callback = link.callback(|e: MouseEvent| Msg::MouseMove(e));
     let up_callback = link.callback(|e: MouseEvent| Msg::MouseUp(e));
     let out_callback = link.callback(|e: MouseEvent| Msg::MouseOut(e));
-    
-    let _mousemove_task = MouseService::new(
-      document().body().unwrap().into(),
-      String::from("mousemove")
-    ).register(move_callback);
-    let _mouseup_task = MouseService::new(
-      document().body().unwrap().into(),
-      String::from("mouseup")
-    ).register(up_callback);
-    let _mouseout_task = MouseService::new(
-      document().body().unwrap().into(),
-      String::from("mouseleave")
-    ).register(out_callback);
 
-    let _tasks = Tasks::new(
-      _mousemove_task,
-      _mouseup_task,
-      _mouseout_task
-    );
+    let _mousemove_task = MouseService::new(String::from("mousemove")).register(move_callback);
+    let _mouseup_task = MouseService::new(String::from("mouseup")).register(up_callback);
+    let _mouseout_task = MouseService::new(String::from("mouseleave")).register(out_callback);
+
+    let _tasks = Tasks::new(_mousemove_task, _mouseup_task, _mouseout_task);
 
     ColorSlider {
       color: String::from(""),
@@ -128,7 +107,7 @@ impl Component for ColorSlider {
       _producer,
       _tasks,
       start_data: None,
-      slider_ref: NodeRef::default()
+      slider_ref: NodeRef::default(),
     }
   }
 
@@ -160,7 +139,7 @@ impl Component for ColorSlider {
       }
 
       Msg::MouseOut(event) => {
-        self.handle_mouse_out(event);
+        self.handle_mouse_up(event);
         false
       }
     }

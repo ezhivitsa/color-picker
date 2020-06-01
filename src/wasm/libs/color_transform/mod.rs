@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::constants::{MAX_CMYK, MAX_SVL, MAX_RGB};
+use crate::constants::{MAX_CMYK, MAX_RGB, MAX_SVL};
 
 lazy_static! {
   static ref HEX_SHORT_REG_EXP: Regex =
@@ -65,7 +65,7 @@ impl HSV {
     HSV {
       hue,
       saturation,
-      value
+      value,
     }
   }
 
@@ -132,14 +132,14 @@ impl HSV {
     } else {
       s_norm *= 2.0 - l_norm;
     }
-    
+
     let v = (l_norm + s_norm) / 2.0;
     let s = (2.0 * s_norm) / (l_norm + s_norm);
 
     HSV {
       hue: h,
       saturation: (s * MAX_SVL as f32).round() as i32,
-      value: (v * MAX_SVL as f32).round() as i32
+      value: (v * MAX_SVL as f32).round() as i32,
     }
   }
 
@@ -188,7 +188,7 @@ impl RGB {
     RGB {
       red: (red * MAX_RGB as f32).round() as i32,
       green: (green * MAX_RGB as f32).round() as i32,
-      blue: (blue * MAX_RGB as f32).round() as i32
+      blue: (blue * MAX_RGB as f32).round() as i32,
     }
   }
 
@@ -214,7 +214,7 @@ impl RGB {
     let p: f32 = v_norm * (1.0 - s_norm);
     let q: f32 = v_norm * (1.0 - s_norm * f);
     let t: f32 = v_norm * (1.0 - s_norm * (1.0 - f));
-    
+
     if i == 0.0 || i == 6.0 {
       return RGB::values_to_rgb(v_norm, t, p);
     } else if i == 1.0 {
@@ -313,7 +313,7 @@ impl CMYK {
       cyan,
       magenta,
       yellow,
-      black
+      black,
     }
   }
 
@@ -363,7 +363,7 @@ impl HSL {
     HSL {
       hue,
       saturation,
-      lightness
+      lightness,
     }
   }
 

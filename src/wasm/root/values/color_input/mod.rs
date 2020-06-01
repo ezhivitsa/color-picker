@@ -1,6 +1,6 @@
+use web_sys::FocusEvent;
 use yew::callback::Callback;
 use yew::html::InputData;
-use web_sys::FocusEvent;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 pub enum Msg {

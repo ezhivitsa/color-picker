@@ -3,6 +3,7 @@ use std::fmt;
 use gloo::events::EventListener;
 use web_sys::Element;
 use web_sys::{Event, MouseEvent};
+use yew::utils::document;
 
 use wasm_bindgen::JsCast;
 
@@ -11,15 +12,13 @@ use yew::callback::Callback;
 /// A service that fires events when a specific element is clicked.
 #[derive(Debug)]
 pub struct MouseService {
-  elem: Element,
-  event: String
+  event: String,
 }
 
 /// A handle to the event listener for click events.
 #[must_use]
 #[allow(dead_code)]
 pub struct MouseTask {
-  elem: Element,
   handle: EventListener,
 }
 
@@ -31,8 +30,8 @@ impl fmt::Debug for MouseTask {
 
 impl MouseService {
   /// Creates a new ClickService.
-  pub fn new(elem: Element, event: String) -> MouseService {
-      MouseService { elem, event }
+  pub fn new(event: String) -> MouseService {
+    MouseService { event }
   }
 
   /// Register a callback that will be called when the user clicks the element.
@@ -46,7 +45,11 @@ impl MouseService {
       callback.emit(mouse_event);
     };
 
-    let handle = EventListener::new(&self.elem, self.event.to_string(), callback);
-    MouseTask { elem: self.elem.clone(), handle }
+    let handle = EventListener::new(
+      &document().body().unwrap().into(),
+      self.event.to_string(),
+      callback,
+    );
+    MouseTask { handle }
   }
 }

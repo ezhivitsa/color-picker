@@ -5,7 +5,7 @@ use yew::worker::{Agent, AgentLink, Context, HandlerId};
 use crate::libs::color_transform::Color;
 use crate::libs::color_validate;
 
-use crate::constants::{MAX_SVL};
+use crate::constants::MAX_SVL;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
@@ -15,7 +15,7 @@ pub enum Request {
   RgbColorChangeMsg(String),
   CmykColorChangeMsg(String),
   HsvColorChangeMsg(String),
-  HslColorChangeMsg(String)
+  HslColorChangeMsg(String),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -57,11 +57,7 @@ pub struct CurrentColorAgent {
 
 impl CurrentColorAgent {
   fn handle_current_hue_change(&mut self, hue: i32) {
-    self.color = Color::from_hsv_values(
-      hue,
-      self.color.get_saturation(),
-      self.color.get_value()
-    );
+    self.color = Color::from_hsv_values(hue, self.color.get_saturation(), self.color.get_value());
     self.send_to_subscribers();
   }
 

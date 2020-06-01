@@ -1,6 +1,6 @@
 use regex::{Regex, RegexSet};
 
-use crate::constants::{MAX_CMYK, MAX_RGB, MIN_CMYK, MIN_RGB, MIN_HSV, MAX_H, MAX_SVL};
+use crate::constants::{MAX_CMYK, MAX_H, MAX_RGB, MAX_SVL, MIN_CMYK, MIN_HSV, MIN_RGB};
 
 lazy_static! {
   static ref HEX: RegexSet =
