@@ -19,7 +19,7 @@ yew = { version = "0.14.1", features = ["web_sys"] }
 serde = "1.0.110"
 regex = "1.3.7"
 lazy_static = "1.4.0"
-rand = "0.7.3"
+rand = { version = "0.7.3", features = ["wasm-bindgen"] }
 gloo = "0.2.1"
 
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
@@ -36,10 +36,9 @@ version = "0.3.36"
 features = [
   "HtmlCanvasElement",
   "Document",
-  "DomStringMap",
   "Element",
   "HtmlElement",
-  "Window",
+  "DomRect"
 ]
 
 [profile.release]

@@ -1,16 +1,17 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use yew::worker::{Agent, AgentLink, Context, HandlerId};
+use rand::prelude::*;
 
 use crate::libs::color_transform::Color;
 use crate::libs::color_validate;
 
-use crate::constants::MAX_SVL;
+use crate::constants::{MAX_SVL, MAX_H};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
-  CurrentHueMsg(i32),
-  CurrentColorMsg(i32, i32),
+  CurrentHueMsg(f32),
+  CurrentColorMsg(f32, f32),
   HexColorChangeMsg(String),
   RgbColorChangeMsg(String),
   CmykColorChangeMsg(String),
@@ -26,9 +27,9 @@ pub struct Response {
   pub hsl: String,
   pub hsv: String,
   pub top_right_corner: String,
-  pub hue: i32,
-  pub saturation: i32,
-  pub value: i32,
+  pub hue: f32,
+  pub saturation: f32,
+  pub value: f32,
 }
 
 impl Response {
@@ -56,12 +57,12 @@ pub struct CurrentColorAgent {
 }
 
 impl CurrentColorAgent {
-  fn handle_current_hue_change(&mut self, hue: i32) {
+  fn handle_current_hue_change(&mut self, hue: f32) {
     self.color = Color::from_hsv_values(hue, self.color.get_saturation(), self.color.get_value());
     self.send_to_subscribers();
   }
 
-  fn handle_current_color_change(&mut self, saturation: i32, value: i32) {
+  fn handle_current_color_change(&mut self, saturation: f32, value: f32) {
     self.color = Color::from_hsv_values(self.color.get_hue(), saturation, value);
     self.send_to_subscribers();
   }
@@ -117,7 +118,13 @@ impl Agent for CurrentColorAgent {
 
   fn create(link: AgentLink<Self>) -> Self {
     // default color
-    let color = Color::from_hsv_values(50, 20, 40);
+    let mut rng = rand::thread_rng();
+    let hue: f32 = rand::random::<f32>() * MAX_H;
+    let saturation: f32 = rng.gen::<f32>() * MAX_SVL;
+    let value: f32 = rng.gen::<f32>() * MAX_SVL;
+
+
+    let color = Color::from_hsv_values(hue.round(), saturation.round(), value.round());
 
     CurrentColorAgent {
       color,

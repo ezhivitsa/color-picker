@@ -14,15 +14,15 @@ lazy_static! {
 }
 
 pub struct HSV {
-  hue: i32,
-  saturation: i32,
-  value: i32,
+  hue: f32,
+  saturation: f32,
+  value: f32,
 }
 
 pub struct RGB {
-  red: i32,
-  green: i32,
-  blue: i32,
+  red: f32,
+  green: f32,
+  blue: f32,
 }
 
 pub struct Hex {
@@ -30,16 +30,16 @@ pub struct Hex {
 }
 
 pub struct CMYK {
-  black: i32,
-  cyan: i32,
-  magenta: i32,
-  yellow: i32,
+  black: f32,
+  cyan: f32,
+  magenta: f32,
+  yellow: f32,
 }
 
 pub struct HSL {
-  hue: i32,
-  saturation: i32,
-  lightness: i32,
+  hue: f32,
+  saturation: f32,
+  lightness: f32,
 }
 
 pub struct Color {
@@ -52,14 +52,14 @@ pub struct Color {
 
 impl HSV {
   pub fn new(hsv: String) -> HSV {
-    let mut hue: i32 = 0;
-    let mut saturation: i32 = 0;
-    let mut value: i32 = 0;
+    let mut hue: f32 = 0.0;
+    let mut saturation: f32 = 0.0;
+    let mut value: f32 = 0.0;
 
     for cap in HSV_REG_EXP.captures_iter(&hsv) {
-      hue = cap[1].parse::<i32>().unwrap();
-      saturation = cap[2].parse::<i32>().unwrap();
-      value = cap[3].parse::<i32>().unwrap();
+      hue = cap[1].parse::<f32>().unwrap();
+      saturation = cap[2].parse::<f32>().unwrap();
+      value = cap[3].parse::<f32>().unwrap();
     }
 
     HSV {
@@ -70,7 +70,7 @@ impl HSV {
   }
 
   // h = [0,360], s = [0,100], v = [0,100]
-  pub fn from_values(h: i32, s: i32, v: i32) -> HSV {
+  pub fn from_values(h: f32, s: f32, v: f32) -> HSV {
     HSV {
       hue: h,
       saturation: s,
@@ -79,41 +79,41 @@ impl HSV {
   }
 
   pub fn from_rgb(rgb: &RGB) -> HSV {
-    let r_norm = rgb.red as f32 / MAX_RGB as f32;
-    let g_norm = rgb.green as f32 / MAX_RGB as f32;
-    let b_norm = rgb.blue as f32 / MAX_RGB as f32;
+    let r_norm = rgb.red / MAX_RGB;
+    let g_norm = rgb.green / MAX_RGB;
+    let b_norm = rgb.blue / MAX_RGB;
 
     // h, s, v = hue, saturation, value
     let cmax = r_norm.max(g_norm.max(b_norm)); // maximum of r, g, b
     let cmin = r_norm.min(g_norm.min(b_norm)); // minimum of r, g, b
     let diff = cmax - cmin; // diff of cmax and cmin.
 
-    let mut h: i32 = -1;
-    let mut s: i32 = -1;
+    let mut h: f32 = -1.0;
+    let mut s: f32 = -1.0;
 
     // if cmax and cmax are equal then h = 0
     if cmax == cmin {
-      h = 0;
+      h = 0.0;
     } else if cmax == r_norm {
       // if cmax equal r then compute h
-      h = (60.0 * ((g_norm - b_norm) / diff) + 360.0).round() as i32 % 360;
+      h = (60.0 * ((g_norm - b_norm) / diff) + 360.0).round() % 360.0;
     } else if cmax == g_norm {
       // if cmax equal g then compute h
-      h = (60.0 * ((b_norm - r_norm) / diff) + 120.0).round() as i32 % 360;
+      h = (60.0 * ((b_norm - r_norm) / diff) + 120.0).round() % 360.0;
     } else if cmax == b_norm {
       // if cmax equal b then compute h
-      h = (60.0 * ((r_norm - g_norm) / diff) + 240.0).round() as i32 % 360;
+      h = (60.0 * ((r_norm - g_norm) / diff) + 240.0).round() % 360.0;
     }
 
     // if cmax equal zero
     if cmax == 0.0 {
-      s = 0;
+      s = 0.0;
     } else {
-      s = ((diff / cmax) * 100.0) as i32;
+      s = (diff / cmax) * 100.0;
     }
 
     // compute v
-    let v: i32 = (cmax * 100.0) as i32;
+    let v: f32 = cmax * 100.0;
 
     HSV {
       hue: h,
@@ -125,8 +125,8 @@ impl HSV {
   pub fn from_hsl(hsl: &HSL) -> HSV {
     let h = hsl.hue;
 
-    let l_norm = hsl.lightness as f32 * 2.0 / MAX_SVL as f32;
-    let mut s_norm = hsl.saturation as f32 / MAX_SVL as f32;
+    let l_norm = hsl.lightness * 2.0 / MAX_SVL;
+    let mut s_norm = hsl.saturation / MAX_SVL;
     if l_norm <= 1.0 {
       s_norm *= l_norm;
     } else {
@@ -138,20 +138,20 @@ impl HSV {
 
     HSV {
       hue: h,
-      saturation: (s * MAX_SVL as f32).round() as i32,
-      value: (v * MAX_SVL as f32).round() as i32,
+      saturation: (s * MAX_SVL).round(),
+      value: (v * MAX_SVL).round(),
     }
   }
 
-  pub fn get_hue(&self) -> i32 {
+  pub fn get_hue(&self) -> f32 {
     self.hue
   }
 
-  pub fn get_saturation(&self) -> i32 {
+  pub fn get_saturation(&self) -> f32 {
     self.saturation
   }
 
-  pub fn get_value(&self) -> i32 {
+  pub fn get_value(&self) -> f32 {
     self.value
   }
 
@@ -162,53 +162,53 @@ impl HSV {
 
 impl RGB {
   pub fn new(value: String) -> RGB {
-    let mut red: i32 = 0;
-    let mut green: i32 = 0;
-    let mut blue: i32 = 0;
+    let mut red: f32 = 0.0;
+    let mut green: f32 = 0.0;
+    let mut blue: f32 = 0.0;
 
     for cap in RGB_REG_EXP.captures_iter(&value) {
-      red = cap[1].parse::<i32>().unwrap();
-      green = cap[2].parse::<i32>().unwrap();
-      blue = cap[3].parse::<i32>().unwrap();
+      red = cap[1].parse::<f32>().unwrap();
+      green = cap[2].parse::<f32>().unwrap();
+      blue = cap[3].parse::<f32>().unwrap();
     }
 
     RGB { red, green, blue }
   }
 
   pub fn from_cmyk(cmyk: &CMYK) -> RGB {
-    let c_norm: f32 = cmyk.cyan as f32 / MAX_CMYK as f32;
-    let m_norm: f32 = cmyk.magenta as f32 / MAX_CMYK as f32;
-    let y_norm: f32 = cmyk.yellow as f32 / MAX_CMYK as f32;
-    let k_norm: f32 = cmyk.black as f32 / MAX_CMYK as f32;
+    let c_norm: f32 = cmyk.cyan / MAX_CMYK;
+    let m_norm: f32 = cmyk.magenta / MAX_CMYK;
+    let y_norm: f32 = cmyk.yellow / MAX_CMYK;
+    let k_norm: f32 = cmyk.black / MAX_CMYK;
 
     let red = (1.0 - c_norm) * (1.0 - k_norm);
     let green = (1.0 - m_norm) * (1.0 - k_norm);
     let blue = (1.0 - y_norm) * (1.0 - k_norm);
 
     RGB {
-      red: (red * MAX_RGB as f32).round() as i32,
-      green: (green * MAX_RGB as f32).round() as i32,
-      blue: (blue * MAX_RGB as f32).round() as i32,
+      red: (red * MAX_RGB).round(),
+      green: (green * MAX_RGB).round(),
+      blue: (blue * MAX_RGB).round(),
     }
   }
 
   fn values_to_rgb(r: f32, g: f32, b: f32) -> RGB {
     RGB {
-      red: (r * 255.0).round() as i32,
-      green: (g * 255.0).round() as i32,
-      blue: (b * 255.0).round() as i32,
+      red: (r * MAX_RGB).round(),
+      green: (g * MAX_RGB).round(),
+      blue: (b * MAX_RGB).round(),
     }
   }
 
   fn from_hsv(hsv: &HSV) -> RGB {
-    let s_norm = hsv.saturation as f32 / MAX_SVL as f32;
-    let v_norm = hsv.value as f32 / MAX_SVL as f32;
+    let s_norm = hsv.saturation / MAX_SVL;
+    let v_norm = hsv.value / MAX_SVL;
 
-    if hsv.saturation == 0 {
+    if hsv.saturation == 0.0 {
       return RGB::values_to_rgb(v_norm, v_norm, v_norm);
     }
 
-    let h_sector: f32 = hsv.hue as f32 / 60.0; // sector 0 to 5
+    let h_sector: f32 = hsv.hue / 60.0; // sector 0 to 5
     let i = h_sector.floor();
     let f = h_sector - i; // factorial part of h
     let p: f32 = v_norm * (1.0 - s_norm);
@@ -250,7 +250,11 @@ impl RGB {
       blue = i32::from_str_radix(&cap[3], 16).unwrap();
     }
 
-    return RGB { red, green, blue };
+    return RGB {
+      red: red as f32,
+      green: green as f32,
+      blue: blue as f32
+    };
   }
 
   pub fn to_string(&self) -> String {
@@ -273,9 +277,9 @@ impl Hex {
   }
 
   fn from_rgb(rgb: &RGB) -> Hex {
-    let r_part = Hex::value_to_hex_part(rgb.red);
-    let g_part = Hex::value_to_hex_part(rgb.green);
-    let b_part = Hex::value_to_hex_part(rgb.blue);
+    let r_part = Hex::value_to_hex_part(rgb.red as i32);
+    let g_part = Hex::value_to_hex_part(rgb.green as i32);
+    let b_part = Hex::value_to_hex_part(rgb.blue as i32);
 
     let value = format!("#{}{}{}", r_part, g_part, b_part);
     Hex { value }
@@ -297,16 +301,16 @@ impl Hex {
 
 impl CMYK {
   pub fn new(value: String) -> CMYK {
-    let mut cyan: i32 = 0;
-    let mut magenta: i32 = 0;
-    let mut yellow: i32 = 0;
-    let mut black: i32 = 0;
+    let mut cyan: f32 = 0.0;
+    let mut magenta: f32 = 0.0;
+    let mut yellow: f32 = 0.0;
+    let mut black: f32 = 0.0;
 
     for cap in CMYK_REG_EXP.captures_iter(&value) {
-      cyan = cap[1].parse::<i32>().unwrap();
-      magenta = cap[2].parse::<i32>().unwrap();
-      yellow = cap[3].parse::<i32>().unwrap();
-      black = cap[4].parse::<i32>().unwrap();
+      cyan = cap[1].parse::<f32>().unwrap();
+      magenta = cap[2].parse::<f32>().unwrap();
+      yellow = cap[3].parse::<f32>().unwrap();
+      black = cap[4].parse::<f32>().unwrap();
     }
 
     CMYK {
@@ -318,19 +322,19 @@ impl CMYK {
   }
 
   pub fn from_rgb(rgb: &RGB) -> CMYK {
-    let r_norm = rgb.red as f32 / MAX_RGB as f32;
-    let g_norm = rgb.green as f32 / MAX_RGB as f32;
-    let b_norm = rgb.blue as f32 / MAX_RGB as f32;
+    let r_norm = rgb.red / MAX_RGB;
+    let g_norm = rgb.green / MAX_RGB;
+    let b_norm = rgb.blue / MAX_RGB;
 
     let black_norm = 1.0 - (r_norm.max(g_norm.max(b_norm)));
     let cyan_norm = (1.0 - r_norm - black_norm) / (1.0 - black_norm);
     let magenta_norm = (1.0 - g_norm - black_norm) / (1.0 - black_norm);
     let yellow_norm = (1.0 - b_norm - black_norm) / (1.0 - black_norm);
 
-    let black = (black_norm * MAX_CMYK as f32).round() as i32;
-    let cyan = (cyan_norm * MAX_CMYK as f32).round() as i32;
-    let magenta = (magenta_norm * MAX_CMYK as f32).round() as i32;
-    let yellow = (yellow_norm * MAX_CMYK as f32).round() as i32;
+    let black = (black_norm * MAX_CMYK).round();
+    let cyan = (cyan_norm * MAX_CMYK).round();
+    let magenta = (magenta_norm * MAX_CMYK).round();
+    let yellow = (yellow_norm * MAX_CMYK).round();
 
     CMYK {
       black,
@@ -350,14 +354,14 @@ impl CMYK {
 
 impl HSL {
   pub fn new(hsl: String) -> HSL {
-    let mut hue: i32 = 0;
-    let mut saturation: i32 = 0;
-    let mut lightness: i32 = 0;
+    let mut hue: f32 = 0.0;
+    let mut saturation: f32 = 0.0;
+    let mut lightness: f32 = 0.0;
 
     for cap in HSV_REG_EXP.captures_iter(&hsl) {
-      hue = cap[1].parse::<i32>().unwrap();
-      saturation = cap[2].parse::<i32>().unwrap();
-      lightness = cap[3].parse::<i32>().unwrap();
+      hue = cap[1].parse::<f32>().unwrap();
+      saturation = cap[2].parse::<f32>().unwrap();
+      lightness = cap[3].parse::<f32>().unwrap();
     }
 
     HSL {
@@ -368,8 +372,8 @@ impl HSL {
   }
 
   pub fn from_hsv(hsv: &HSV) -> HSL {
-    let s_norm = hsv.saturation as f32 / MAX_SVL as f32;
-    let v_norm = hsv.value as f32 / MAX_SVL as f32;
+    let s_norm = hsv.saturation / MAX_SVL;
+    let v_norm = hsv.value / MAX_SVL;
 
     let lightness: f32 = (2.0 - s_norm) * v_norm / 2.0;
 
@@ -387,8 +391,8 @@ impl HSL {
 
     HSL {
       hue: hsv.hue,
-      saturation: (saturation * MAX_SVL as f32).round() as i32,
-      lightness: (lightness * MAX_SVL as f32).round() as i32,
+      saturation: (saturation * MAX_SVL).round(),
+      lightness: (lightness * MAX_SVL).round(),
     }
   }
 
@@ -398,7 +402,7 @@ impl HSL {
 }
 
 impl Color {
-  pub fn from_hsv_values(h: i32, s: i32, v: i32) -> Color {
+  pub fn from_hsv_values(h: f32, s: f32, v: f32) -> Color {
     let hsv = HSV::from_values(h, s, v);
     let rgb = RGB::from_hsv(&hsv);
     let hex = Hex::from_rgb(&rgb);
@@ -494,15 +498,15 @@ impl Color {
     }
   }
 
-  pub fn get_hue(&self) -> i32 {
+  pub fn get_hue(&self) -> f32 {
     self.hsv.hue
   }
 
-  pub fn get_saturation(&self) -> i32 {
+  pub fn get_saturation(&self) -> f32 {
     self.hsv.saturation
   }
 
-  pub fn get_value(&self) -> i32 {
+  pub fn get_value(&self) -> f32 {
     self.hsv.value
   }
 

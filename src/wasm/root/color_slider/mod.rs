@@ -1,11 +1,11 @@
-use web_sys::{HtmlElement, MouseEvent};
+use web_sys::{HtmlElement, MouseEvent, Element};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, ShouldRender};
 
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use crate::services::mouse::{MouseService, MouseTask};
 
-use crate::constants::MAX_H;
+use crate::constants::{MAX_H, MIN_HSV};
 
 pub enum Msg {
   CurrentColorMessage(Response),
@@ -13,6 +13,7 @@ pub enum Msg {
   MouseMove(MouseEvent),
   MouseUp(MouseEvent),
   MouseOut(MouseEvent),
+  SliderClick(MouseEvent)
 }
 
 struct Tasks {
@@ -22,7 +23,7 @@ struct Tasks {
 }
 
 struct SliderData {
-  hue: i32,
+  hue: f32,
   start: i32,
 }
 
@@ -38,7 +39,7 @@ impl Tasks {
 
 pub struct ColorSlider {
   color: String,
-  hue: i32,
+  hue: f32,
   link: ComponentLink<ColorSlider>,
   current_color_agent: Dispatcher<CurrentColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
@@ -64,11 +65,11 @@ impl ColorSlider {
         .unwrap()
         .offset_width();
 
-      let hue_diff = diff as f32 / slider_width as f32 * MAX_H as f32;
-      let hue_diff = hue_diff.round() as i32;
+      let hue_diff = diff as f32 / slider_width as f32 * MAX_H;
+      let hue_diff = hue_diff.round();
 
       let hue = start_data.hue + hue_diff;
-      let hue = (hue.max(0)).min(MAX_H);
+      let hue = (hue.max(MIN_HSV)).min(MAX_H);
 
       self.current_color_agent.send(Request::CurrentHueMsg(hue));
     }
@@ -76,6 +77,31 @@ impl ColorSlider {
 
   fn handle_mouse_up(&mut self, _: MouseEvent) {
     self.start_data = None;
+  }
+
+  fn handle_slider_click(&mut self, event: MouseEvent) {
+    let x = event.client_x();
+    let left = self
+      .slider_ref
+      .cast::<Element>()
+      .unwrap()
+      .get_bounding_client_rect()
+      .left() as i32;
+
+    let pallet_width = self
+      .slider_ref
+      .cast::<HtmlElement>()
+      .unwrap()
+      .offset_width();
+
+    let hue = (x - left) as f32 / pallet_width as f32 * MAX_H;
+    let hue = hue.round();
+
+    self.current_color_agent.send(Request::CurrentHueMsg(hue));
+    self.start_data = Some(SliderData {
+      start: x,
+      hue,
+    });
   }
 }
 
@@ -101,7 +127,7 @@ impl Component for ColorSlider {
 
     ColorSlider {
       color: String::from(""),
-      hue: 0,
+      hue: 0.0,
       link,
       current_color_agent,
       _producer,
@@ -142,6 +168,11 @@ impl Component for ColorSlider {
         self.handle_mouse_up(event);
         false
       }
+
+      Msg::SliderClick(event) => {
+        self.handle_slider_click(event);
+        false
+      }
     }
   }
 
@@ -151,8 +182,9 @@ impl Component for ColorSlider {
     html! {
       <div class="slider">
         <div
-          class="slider__hue"
           ref={self.slider_ref.clone()}
+          class="slider__hue"
+          onmousedown={self.link.callback(|e: MouseEvent| Msg::SliderClick(e))}
         />
         <div
           class="slider__selector"

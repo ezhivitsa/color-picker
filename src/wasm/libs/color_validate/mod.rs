@@ -20,14 +20,14 @@ pub fn is_valid_rgb(rgb: &str) -> bool {
     return false;
   }
 
-  let mut red: i32 = -1;
-  let mut green: i32 = -1;
-  let mut blue: i32 = -1;
+  let mut red: f32 = -1.0;
+  let mut green: f32 = -1.0;
+  let mut blue: f32 = -1.0;
 
   for cap in RGB.captures_iter(&rgb) {
-    red = cap[1].parse::<i32>().unwrap();
-    green = cap[2].parse::<i32>().unwrap();
-    blue = cap[3].parse::<i32>().unwrap();
+    red = cap[1].parse::<f32>().unwrap();
+    green = cap[2].parse::<f32>().unwrap();
+    blue = cap[3].parse::<f32>().unwrap();
   }
 
   return MIN_RGB <= red
@@ -43,16 +43,16 @@ pub fn is_valid_cmyk(cmyk: &str) -> bool {
     return false;
   }
 
-  let mut cyan: i32 = -1;
-  let mut magenta: i32 = -1;
-  let mut yellow: i32 = -1;
-  let mut key: i32 = -1;
+  let mut cyan: f32 = -1.0;
+  let mut magenta: f32 = -1.0;
+  let mut yellow: f32 = -1.0;
+  let mut key: f32 = -1.0;
 
   for cap in CMYK.captures_iter(&cmyk) {
-    cyan = cap[1].parse::<i32>().unwrap();
-    magenta = cap[2].parse::<i32>().unwrap();
-    yellow = cap[3].parse::<i32>().unwrap();
-    key = cap[4].parse::<i32>().unwrap();
+    cyan = cap[1].parse::<f32>().unwrap();
+    magenta = cap[2].parse::<f32>().unwrap();
+    yellow = cap[3].parse::<f32>().unwrap();
+    key = cap[4].parse::<f32>().unwrap();
   }
 
   return MIN_CMYK <= cyan
@@ -70,14 +70,14 @@ pub fn is_valid_hsv(hsv: &str) -> bool {
     return false;
   }
 
-  let mut hue: i32 = -1;
-  let mut saturation: i32 = -1;
-  let mut value: i32 = -1;
+  let mut hue: f32 = -1.0;
+  let mut saturation: f32 = -1.0;
+  let mut value: f32 = -1.0;
 
   for cap in HSV.captures_iter(&hsv) {
-    hue = cap[1].parse::<i32>().unwrap();
-    saturation = cap[2].parse::<i32>().unwrap();
-    value = cap[3].parse::<i32>().unwrap();
+    hue = cap[1].parse::<f32>().unwrap();
+    saturation = cap[2].parse::<f32>().unwrap();
+    value = cap[3].parse::<f32>().unwrap();
   }
 
   return MIN_HSV <= hue
