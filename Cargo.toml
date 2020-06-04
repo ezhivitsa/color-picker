@@ -15,16 +15,16 @@ crate-type = ["cdylib"]
 path = "src/wasm/lib.rs"
 
 [dependencies]
-yew = { version = "0.14.1", features = ["web_sys"] }
-serde = "1.0.110"
-regex = "1.3.7"
+yew = { version = "0.16.2", features = ["web_sys"] }
+serde = "1.0.111"
+regex = "1.3.9"
 lazy_static = "1.4.0"
 rand = { version = "0.7.3", features = ["wasm-bindgen"] }
 gloo = "0.2.1"
 
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.
-wasm-bindgen = "0.2.62"
+wasm-bindgen = "0.2.63"
 
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. However, it is slower than the default
@@ -32,9 +32,10 @@ wasm-bindgen = "0.2.62"
 wee_alloc = { version = "0.4.5", optional = true }
 
 [dependencies.web-sys]
-version = "0.3.36"
+version = "0.3.40"
 features = [
   "HtmlCanvasElement",
+  "CanvasRenderingContext2d",
   "Document",
   "Element",
   "HtmlElement",

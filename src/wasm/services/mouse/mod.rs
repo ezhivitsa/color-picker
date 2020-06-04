@@ -1,7 +1,6 @@
 use std::fmt;
 
 use gloo::events::EventListener;
-use web_sys::Element;
 use web_sys::{Event, MouseEvent};
 use yew::utils::document;
 

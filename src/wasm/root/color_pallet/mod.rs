@@ -1,17 +1,21 @@
+use web_sys::{Element, HtmlElement, MouseEvent};
 use yew::agent::{Dispatched, Dispatcher};
-use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender, NodeRef};
-use web_sys::{HtmlElement, MouseEvent, Element};
+use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, ShouldRender};
+
+use pallet_canvas::PalletCanvas;
 
 use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
 use crate::services::mouse::{MouseService, MouseTask};
 
 use crate::constants::{MAX_SVL, MIN_HSV};
 
+pub mod pallet_canvas;
+
 struct SliderData {
   saturation: f32,
   value: f32,
   start_x: i32,
-  start_y: i32
+  start_y: i32,
 }
 
 struct Tasks {
@@ -39,7 +43,7 @@ pub struct ColorPallet {
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   pallet_ref: NodeRef,
   start_data: Option<SliderData>,
-  _tasks: Tasks
+  _tasks: Tasks,
 }
 
 pub enum Msg {
@@ -47,15 +51,12 @@ pub enum Msg {
   MouseDown(MouseEvent),
   MouseMove(MouseEvent),
   MouseUp(MouseEvent),
-  MouseOut(MouseEvent)
+  MouseOut(MouseEvent),
 }
 
 impl ColorPallet {
   fn get_color_values(&mut self, x: i32, y: i32) -> (f32, f32) {
-    let pallet = self
-      .pallet_ref
-      .cast::<HtmlElement>()
-      .unwrap();
+    let pallet = self.pallet_ref.cast::<HtmlElement>().unwrap();
 
     let rect = self
       .pallet_ref
@@ -77,23 +78,22 @@ impl ColorPallet {
 
     (
       (saturation.max(MIN_HSV)).min(MAX_SVL),
-      (value.max(MIN_HSV)).min(MAX_SVL)
+      (value.max(MIN_HSV)).min(MAX_SVL),
     )
   }
 
   fn handle_mouse_down(&mut self, event: MouseEvent) {
-    let (saturation, value) = self.get_color_values(
-      event.client_x(),
-      event.client_y()
-    );
+    let (saturation, value) = self.get_color_values(event.client_x(), event.client_y());
 
     self.start_data = Some(SliderData {
       start_x: event.client_x(),
       start_y: event.client_y(),
       saturation,
-      value
+      value,
     });
-    self.current_color_agent.send(Request::CurrentColorMsg(saturation, value));
+    self
+      .current_color_agent
+      .send(Request::CurrentColorMsg(saturation, value));
   }
 
   fn handle_mouse_move(&mut self, event: MouseEvent) {
@@ -101,10 +101,7 @@ impl ColorPallet {
       let diff_x = event.client_x() - start_data.start_x;
       let diff_y = event.client_y() - start_data.start_y;
 
-      let pallet_element = self
-        .pallet_ref
-        .cast::<HtmlElement>()
-        .unwrap();
+      let pallet_element = self.pallet_ref.cast::<HtmlElement>().unwrap();
 
       let pallet_width = pallet_element.offset_width();
       let pallet_height = pallet_element.offset_height();
@@ -121,7 +118,9 @@ impl ColorPallet {
       let value = start_data.value - value_diff;
       let value = (value.max(MIN_HSV)).min(MAX_SVL);
 
-      self.current_color_agent.send(Request::CurrentColorMsg(saturation, value));
+      self
+        .current_color_agent
+        .send(Request::CurrentColorMsg(saturation, value));
     }
   }
 
@@ -156,10 +155,10 @@ impl Component for ColorPallet {
       value: 0.0,
       current_color_agent,
       link,
-      _producer,
       pallet_ref: NodeRef::default(),
+      start_data: None,
+      _producer,
       _tasks,
-      start_data: None
     }
   }
 
@@ -196,7 +195,6 @@ impl Component for ColorPallet {
         self.handle_mouse_up(event);
         false
       }
-
     }
   }
 
@@ -211,6 +209,7 @@ impl Component for ColorPallet {
           ref={self.pallet_ref.clone()}
           onmousedown={self.link.callback(|e: MouseEvent| Msg::MouseDown(e))}
         >
+          <PalletCanvas />
           <div
             class="pallet__selector"
             style={format!("background-color: {}; bottom: {}%; left: {}%;", self.color, bottom, left)}

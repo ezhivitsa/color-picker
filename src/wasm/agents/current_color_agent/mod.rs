@@ -1,12 +1,12 @@
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use yew::worker::{Agent, AgentLink, Context, HandlerId};
-use rand::prelude::*;
 
 use crate::libs::color_transform::Color;
 use crate::libs::color_validate;
 
-use crate::constants::{MAX_SVL, MAX_H};
+use crate::constants::{MAX_H, MAX_SVL};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
@@ -122,7 +122,6 @@ impl Agent for CurrentColorAgent {
     let hue: f32 = rand::random::<f32>() * MAX_H;
     let saturation: f32 = rng.gen::<f32>() * MAX_SVL;
     let value: f32 = rng.gen::<f32>() * MAX_SVL;
-
 
     let color = Color::from_hsv_values(hue.round(), saturation.round(), value.round());
 

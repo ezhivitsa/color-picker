@@ -1,4 +1,4 @@
-use web_sys::{HtmlElement, MouseEvent, Element};
+use web_sys::{Element, HtmlElement, MouseEvent};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, ShouldRender};
 
@@ -13,7 +13,7 @@ pub enum Msg {
   MouseMove(MouseEvent),
   MouseUp(MouseEvent),
   MouseOut(MouseEvent),
-  SliderClick(MouseEvent)
+  SliderClick(MouseEvent),
 }
 
 struct Tasks {
@@ -98,10 +98,7 @@ impl ColorSlider {
     let hue = hue.round();
 
     self.current_color_agent.send(Request::CurrentHueMsg(hue));
-    self.start_data = Some(SliderData {
-      start: x,
-      hue,
-    });
+    self.start_data = Some(SliderData { start: x, hue });
   }
 }
 

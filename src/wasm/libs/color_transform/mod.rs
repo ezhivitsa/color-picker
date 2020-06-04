@@ -89,7 +89,6 @@ impl HSV {
     let diff = cmax - cmin; // diff of cmax and cmin.
 
     let mut h: f32 = -1.0;
-    let mut s: f32 = -1.0;
 
     // if cmax and cmax are equal then h = 0
     if cmax == cmin {
@@ -106,11 +105,11 @@ impl HSV {
     }
 
     // if cmax equal zero
-    if cmax == 0.0 {
-      s = 0.0;
+    let s = if cmax == 0.0 {
+      0.0
     } else {
-      s = (diff / cmax) * 100.0;
-    }
+      (diff / cmax) * 100.0
+    };
 
     // compute v
     let v: f32 = cmax * 100.0;
@@ -141,18 +140,6 @@ impl HSV {
       saturation: (s * MAX_SVL).round(),
       value: (v * MAX_SVL).round(),
     }
-  }
-
-  pub fn get_hue(&self) -> f32 {
-    self.hue
-  }
-
-  pub fn get_saturation(&self) -> f32 {
-    self.saturation
-  }
-
-  pub fn get_value(&self) -> f32 {
-    self.value
   }
 
   pub fn to_string(&self) -> String {
@@ -200,7 +187,7 @@ impl RGB {
     }
   }
 
-  fn from_hsv(hsv: &HSV) -> RGB {
+  pub fn from_hsv(hsv: &HSV) -> RGB {
     let s_norm = hsv.saturation / MAX_SVL;
     let v_norm = hsv.value / MAX_SVL;
 
@@ -253,7 +240,7 @@ impl RGB {
     return RGB {
       red: red as f32,
       green: green as f32,
-      blue: blue as f32
+      blue: blue as f32,
     };
   }
 
