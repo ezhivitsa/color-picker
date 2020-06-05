@@ -3,6 +3,7 @@ use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
 use crate::root::values::color_input::ColorInput;
+use crate::texts::TEXTS;
 
 pub enum Msg {
   NewMessage(Response),
@@ -63,7 +64,7 @@ impl Component for HsvValue {
     html! {
         <div class="value-color">
           <span class="value-color__title">
-            {"HSV"}
+            {TEXTS.hsv}
           </span>
           <ColorInput
             class="value-color__input"

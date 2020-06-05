@@ -3,6 +3,7 @@ mod constants;
 mod libs;
 mod root;
 mod services;
+mod texts;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;

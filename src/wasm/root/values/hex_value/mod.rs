@@ -3,6 +3,7 @@ use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
 use crate::root::values::color_input::ColorInput;
+use crate::texts::TEXTS;
 
 pub enum Msg {
   NewMessage(Response),
@@ -67,7 +68,7 @@ impl Component for HexValue {
     html! {
         <div class="hex-color">
           <span class="hex-color__title">
-            {"HEX"}
+            {TEXTS.hex}
           </span>
           <ColorInput
             class="hex-color__input"

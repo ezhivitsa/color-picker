@@ -6,6 +6,9 @@ use yew::worker::{Agent, AgentLink, Context, HandlerId};
 use crate::libs::color_transform::Color;
 use crate::libs::color_validate;
 
+use crate::libs::color_transform::hsv_color::HSV;
+use crate::libs::color_transform::rgb_color::RGB;
+
 use crate::constants::{MAX_H, MAX_SVL};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,7 +37,8 @@ pub struct Response {
 
 impl Response {
   fn new(color: &Color) -> Response {
-    let top_right_color = Color::from_hsv_values(color.get_hue(), MAX_SVL, MAX_SVL);
+    let top_right_hsv = HSV::from_values(color.get_hue(), MAX_SVL, MAX_SVL);
+    let top_right_rgb = RGB::from_hsv(&top_right_hsv);
 
     Response {
       hex: color.hex_value(),
@@ -42,7 +46,7 @@ impl Response {
       cmyk: color.cmyk_value(),
       hsl: color.hsl_value(),
       hsv: color.hsv_value(),
-      top_right_corner: top_right_color.hex_value(),
+      top_right_corner: top_right_rgb.to_color_string(),
       hue: color.get_hue(),
       saturation: color.get_saturation(),
       value: color.get_value(),

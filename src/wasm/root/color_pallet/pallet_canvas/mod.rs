@@ -5,7 +5,8 @@ use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, Should
 use crate::agents::current_color_agent::{CurrentColorAgent, Response};
 
 use crate::constants::MAX_SVL;
-use crate::libs::color_transform::{HSV, RGB};
+use crate::libs::color_transform::hsv_color::HSV;
+use crate::libs::color_transform::rgb_color::RGB;
 
 pub enum Msg {
   CurrentColorMessage(Response),
@@ -39,7 +40,7 @@ impl PalletCanvas {
         let hsv = HSV::from_values(self.hue, j as f32, (height - i) as f32);
         let rgb = RGB::from_hsv(&hsv);
 
-        ctx.set_fill_style(&JsValue::from_str(&format!("rgb({})", rgb.to_string())));
+        ctx.set_fill_style(&JsValue::from_str(&rgb.to_color_string()));
         ctx.fill_rect(j as f64, i as f64, 1.0, 1.0);
       }
     }

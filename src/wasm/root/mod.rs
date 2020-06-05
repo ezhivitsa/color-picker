@@ -9,6 +9,8 @@ use color_pallet::ColorPallet;
 use color_slider::ColorSlider;
 use color_value::ColorValue;
 
+use crate::texts::TEXTS;
+
 pub struct Root;
 
 impl Component for Root {
@@ -31,7 +33,7 @@ impl Component for Root {
     html! {
         <div class="color-picker">
             <h1 class="color-picker__title">
-              {"Color picker"}
+              {TEXTS.title}
             </h1>
 
             <div class="colors">

@@ -1,22 +1,14 @@
-use regex::{Regex, RegexSet};
-
-use crate::constants::{MAX_CMYK, MAX_H, MAX_RGB, MAX_SVL, MIN_CMYK, MIN_HSV, MIN_RGB};
-
-lazy_static! {
-  static ref HEX: RegexSet =
-    RegexSet::new(&[r"^#?([\da-fA-F]{3})$", r"^#?([\da-fA-F]{6})$"]).unwrap();
-  static ref RGB: Regex = Regex::new(r"^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$").unwrap();
-  static ref CMYK: Regex =
-    Regex::new(r"^(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%,\s*(\d{1,3})%$").unwrap();
-  static ref HSV: Regex = Regex::new(r"(\d{1,3})°,\s*(\d{1,3})%,\s*(\d{1,3})%").unwrap();
-}
+use crate::constants::{
+  CMYK_REG_EXP, HEX_LONG_REG_EXP, HEX_SHORT_REG_EXP, HSV_REG_EXP, MAX_CMYK, MAX_H, MAX_RGB,
+  MAX_SVL, MIN_CMYK, MIN_HSV, MIN_RGB, RGB_REG_EXP,
+};
 
 pub fn is_valid_hex(hex: &str) -> bool {
-  HEX.is_match(hex)
+  HEX_SHORT_REG_EXP.is_match(hex) || HEX_LONG_REG_EXP.is_match(hex)
 }
 
 pub fn is_valid_rgb(rgb: &str) -> bool {
-  if !RGB.is_match(rgb) {
+  if !RGB_REG_EXP.is_match(rgb) {
     return false;
   }
 
@@ -24,7 +16,7 @@ pub fn is_valid_rgb(rgb: &str) -> bool {
   let mut green: f32 = -1.0;
   let mut blue: f32 = -1.0;
 
-  for cap in RGB.captures_iter(&rgb) {
+  for cap in RGB_REG_EXP.captures_iter(&rgb) {
     red = cap[1].parse::<f32>().unwrap();
     green = cap[2].parse::<f32>().unwrap();
     blue = cap[3].parse::<f32>().unwrap();
@@ -39,7 +31,7 @@ pub fn is_valid_rgb(rgb: &str) -> bool {
 }
 
 pub fn is_valid_cmyk(cmyk: &str) -> bool {
-  if !CMYK.is_match(cmyk) {
+  if !CMYK_REG_EXP.is_match(cmyk) {
     return false;
   }
 
@@ -48,7 +40,7 @@ pub fn is_valid_cmyk(cmyk: &str) -> bool {
   let mut yellow: f32 = -1.0;
   let mut key: f32 = -1.0;
 
-  for cap in CMYK.captures_iter(&cmyk) {
+  for cap in CMYK_REG_EXP.captures_iter(&cmyk) {
     cyan = cap[1].parse::<f32>().unwrap();
     magenta = cap[2].parse::<f32>().unwrap();
     yellow = cap[3].parse::<f32>().unwrap();
@@ -66,7 +58,7 @@ pub fn is_valid_cmyk(cmyk: &str) -> bool {
 }
 
 pub fn is_valid_hsv(hsv: &str) -> bool {
-  if !HSV.is_match(hsv) {
+  if !HSV_REG_EXP.is_match(hsv) {
     return false;
   }
 
@@ -74,7 +66,7 @@ pub fn is_valid_hsv(hsv: &str) -> bool {
   let mut saturation: f32 = -1.0;
   let mut value: f32 = -1.0;
 
-  for cap in HSV.captures_iter(&hsv) {
+  for cap in HSV_REG_EXP.captures_iter(&hsv) {
     hue = cap[1].parse::<f32>().unwrap();
     saturation = cap[2].parse::<f32>().unwrap();
     value = cap[3].parse::<f32>().unwrap();

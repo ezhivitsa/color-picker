@@ -11,7 +11,7 @@ clean: clean-dist clean-pkg
 
 .PHONY: build-wasm-pack
 build-wasm-pack:
-	wasm-pack build --out-dir pkg
+	wasm-pack build --release --out-dir pkg
 
 .PHONY: build-wasm
 build-wasm: clean-pkg build-wasm-pack
