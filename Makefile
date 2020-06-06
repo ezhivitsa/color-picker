@@ -37,24 +37,16 @@ dev: clean webpack-dev
 deps:
 	npm ci
 
-.PHONY: lint-js
-lint-js:
-	npx eslint "src/client/**/*.{ts,tsx}"
-
 .PHONY: lint-styles
 lint-styles:
 	npx stylelint "src/client/**/*.pcss"
-
-.PHONY: test-jest
-test-jest:
-	npx jest
 
 .PHONY: test-cargo
 test-cargo:
 	cargo test
 
 .PHONY: test
-test: lint-js lint-styles test-jest test-cargo
+test: lint-styles test-cargo
 
 .PHONY: deploy-gh-pages
 deploy-gh-pages:

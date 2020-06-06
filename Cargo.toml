@@ -1,6 +1,6 @@
 # You must change these to your own details.
 [package]
-name = "color-picker"
+name = "color_picker"
 description = "My super awesome Rust, WebAssembly, and Webpack project!"
 version = "0.1.0"
 authors = ["Evgeny Zhivitsa <evgeny.zhivitsa@gmail.com>"]
@@ -11,7 +11,7 @@ license = "MIT"
 repository = "https://github.com/ezhivitsa/color-picker"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["rlib", "cdylib"]
 path = "src/wasm/lib.rs"
 
 [dependencies]
