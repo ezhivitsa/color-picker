@@ -6,7 +6,7 @@
 [![Watch on GitHub](https://img.shields.io/github/watchers/ezhivitsa/color-picker.svg?style=social&label=Watch)](https://github.com/ezhivitsa/color-picker/watchers)
 [![Star on GitHub](https://img.shields.io/github/stars/ezhivitsa/color-picker.svg?style=social&label=Stars)](https://github.com/ezhivitsa/color-picker/stargazers)
 
-Calculator is based on the following primary technologies:
+Color-picker is based on the following primary technologies:
 
 - webpack
 - postcss
@@ -48,6 +48,13 @@ To start tests type the following command:
 $ make test
 ```
 
+### How wo publish on github pages demo
+
+To start tests type the following command:
+```bash
+$ make deploy
+```
+
 ### Explanations of the files structure.
 
 1. **[src/client/styles](src/client/styles)** - global styles and css variables, styles for components
@@ -70,4 +77,4 @@ $ make test
 
 ## License
 
-Calculator is released under the [MIT License](LICENSE).
+Color-picker is released under the [MIT License](LICENSE).

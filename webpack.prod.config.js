@@ -26,14 +26,6 @@ module.exports = {
 
   module: {
     rules: [
-      {
-        test: /\.(ts|js)x?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
-      },
-
       // css-loader to bundle all the css files into one file and style-loader
       // to add all the styles inside the style tag of the document
       {
@@ -43,13 +35,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
-              modules: {
-                mode: 'local',
-                localIdentName: '[local]--[hash:base64:5]',
-                context: path.resolve(__dirname, 'src/client'),
-              },
-              localsConvention: 'dashesOnly',
+              importLoaders: 1
             },
           },
           'postcss-loader',
