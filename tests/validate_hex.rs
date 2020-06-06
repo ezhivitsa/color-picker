@@ -1,5 +1,5 @@
-use color_picker::libs::color_validate;
 use color_picker::libs::color_transform::Color;
+use color_picker::libs::color_validate;
 
 #[test]
 fn should_validate_hex_string() {

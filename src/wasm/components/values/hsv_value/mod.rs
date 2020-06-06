@@ -1,9 +1,9 @@
 use crate::agents::current_color_agent::{CurrentColorAgent, Response};
-use crate::agents::hsl_color_agent::{HslColorAgent, Request};
+use crate::agents::hsv_color_agent::{HsvColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
-use crate::root::values::color_input::ColorInput;
+use crate::components::values::color_input::ColorInput;
 use crate::texts::TEXTS;
 
 pub enum Msg {
@@ -11,35 +11,33 @@ pub enum Msg {
   ValueChanged(String),
 }
 
-pub struct HslValue {
-  hsl_value: String,
-  link: ComponentLink<HslValue>,
-  hsl_color_agent: Dispatcher<HslColorAgent>,
+pub struct HsvValue {
+  hsv_value: String,
+  link: ComponentLink<HsvValue>,
+  hsv_color_agent: Dispatcher<HsvColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
 }
 
-impl HslValue {
+impl HsvValue {
   fn handle_value_change(&mut self, value: String) {
-    self
-      .hsl_color_agent
-      .send(Request::HslColorChangeMsg(value));
+    self.hsv_color_agent.send(Request::HsvColorChangeMsg(value));
   }
 }
 
-impl Component for HslValue {
+impl Component for HsvValue {
   type Message = Msg;
   type Properties = ();
 
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let hsl_color_agent = HslColorAgent::dispatcher();
+    let hsv_color_agent = HsvColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
-    HslValue {
-      hsl_value: String::from(""),
+    HsvValue {
+      hsv_value: String::from(""),
       link,
-      hsl_color_agent,
+      hsv_color_agent,
       _producer,
     }
   }
@@ -51,11 +49,11 @@ impl Component for HslValue {
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::NewMessage(response) => {
-        self.hsl_value = response.hsl;
+        self.hsv_value = response.hsv;
         true
       }
-      Msg::ValueChanged(e) => {
-        self.handle_value_change(e);
+      Msg::ValueChanged(value) => {
+        self.handle_value_change(value);
         false
       }
     }
@@ -65,11 +63,11 @@ impl Component for HslValue {
     html! {
         <div class="value-color">
           <span class="value-color__title">
-            {TEXTS.hsl}
+            {TEXTS.hsv}
           </span>
           <ColorInput
             class="value-color__input"
-            value={&self.hsl_value}
+            value={&self.hsv_value}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>

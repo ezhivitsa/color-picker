@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use yew::agent::{Dispatcher, Agent, Context, AgentLink, Dispatched, HandlerId, Bridge, Bridged};
+use yew::agent::{Agent, AgentLink, Bridge, Bridged, Context, Dispatched, Dispatcher, HandlerId};
 
 use crate::agents::current_color_agent::{CurrentColorAgent, CurrentColorRequest, Response};
 use crate::libs::color_transform::Color;
@@ -14,7 +14,7 @@ pub enum Request {
 }
 
 pub enum Msg {
-  CurrentColorChange(Response)
+  CurrentColorChange(Response),
 }
 
 pub struct HsvColorAgent {
@@ -22,7 +22,7 @@ pub struct HsvColorAgent {
   saturation: f32,
   value: f32,
   current_color_dispatcher: Dispatcher<CurrentColorAgent>,
-  _producer: Box<dyn Bridge<CurrentColorAgent>>
+  _producer: Box<dyn Bridge<CurrentColorAgent>>,
 }
 
 impl Agent for HsvColorAgent {
@@ -40,7 +40,7 @@ impl Agent for HsvColorAgent {
       saturation: 0.0,
       value: 0.0,
       current_color_dispatcher: CurrentColorAgent::dispatcher(),
-      _producer
+      _producer,
     }
   }
 
@@ -59,26 +59,24 @@ impl Agent for HsvColorAgent {
       Request::HsvColorChangeMsg(hsv) => {
         if color_validate::is_valid_hsv(&hsv) {
           let color = Color::from_hsv(hsv);
-          self.current_color_dispatcher.send(CurrentColorRequest::UpdateColor(color));
+          self
+            .current_color_dispatcher
+            .send(CurrentColorRequest::UpdateColor(color));
         }
       }
 
       Request::HueChangedMsg(hue) => {
-        let color = Color::from_hsv_values(
-          hue,
-          self.saturation,
-          self.value
-        );
-        self.current_color_dispatcher.send(CurrentColorRequest::UpdateColor(color));
+        let color = Color::from_hsv_values(hue, self.saturation, self.value);
+        self
+          .current_color_dispatcher
+          .send(CurrentColorRequest::UpdateColor(color));
       }
 
       Request::SaturationValueChangedMsg(saturation, value) => {
-        let color = Color::from_hsv_values(
-          self.hue,
-          saturation,
-          value
-        );
-        self.current_color_dispatcher.send(CurrentColorRequest::UpdateColor(color));
+        let color = Color::from_hsv_values(self.hue, saturation, value);
+        self
+          .current_color_dispatcher
+          .send(CurrentColorRequest::UpdateColor(color));
       }
     }
   }

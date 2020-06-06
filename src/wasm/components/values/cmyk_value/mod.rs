@@ -1,9 +1,9 @@
+use crate::agents::cmyk_color_agent::{CmykColorAgent, Request};
 use crate::agents::current_color_agent::{CurrentColorAgent, Response};
-use crate::agents::hsv_color_agent::{HsvColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
-use crate::root::values::color_input::ColorInput;
+use crate::components::values::color_input::ColorInput;
 use crate::texts::TEXTS;
 
 pub enum Msg {
@@ -11,52 +11,52 @@ pub enum Msg {
   ValueChanged(String),
 }
 
-pub struct HsvValue {
-  hsv_value: String,
-  link: ComponentLink<HsvValue>,
-  hsv_color_agent: Dispatcher<HsvColorAgent>,
+pub struct CmykValue {
+  cmyk_value: String,
+  link: ComponentLink<CmykValue>,
+  cmyk_color_agent: Dispatcher<CmykColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
 }
 
-impl HsvValue {
+impl CmykValue {
   fn handle_value_change(&mut self, value: String) {
     self
-      .hsv_color_agent
-      .send(Request::HsvColorChangeMsg(value));
+      .cmyk_color_agent
+      .send(Request::CmykColorChangeMsg(value));
   }
 }
 
-impl Component for HsvValue {
+impl Component for CmykValue {
   type Message = Msg;
   type Properties = ();
 
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let hsv_color_agent = HsvColorAgent::dispatcher();
+    let cmyk_color_agent = CmykColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
-    HsvValue {
-      hsv_value: String::from(""),
+    CmykValue {
+      cmyk_value: String::from(""),
       link,
-      hsv_color_agent,
+      cmyk_color_agent,
       _producer,
     }
   }
 
-  fn change(&mut self, _: Self::Properties) -> bool {
+  fn change(&mut self, _: Self::Properties) -> ShouldRender {
     false
   }
 
   fn update(&mut self, msg: Self::Message) -> ShouldRender {
     match msg {
       Msg::NewMessage(response) => {
-        self.hsv_value = response.hsv;
+        self.cmyk_value = response.cmyk;
         true
       }
       Msg::ValueChanged(value) => {
         self.handle_value_change(value);
-        false
+        true
       }
     }
   }
@@ -65,11 +65,11 @@ impl Component for HsvValue {
     html! {
         <div class="value-color">
           <span class="value-color__title">
-            {TEXTS.hsv}
+            {TEXTS.cmyk}
           </span>
           <ColorInput
             class="value-color__input"
-            value={&self.hsv_value}
+            value={&self.cmyk_value}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>

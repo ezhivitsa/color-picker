@@ -1,14 +1,14 @@
 mod agents;
 mod constants;
 pub mod libs;
-mod root;
+mod components;
 mod services;
 mod texts;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
-use root::Root;
+use components::root::Root;
 
 #[macro_use]
 extern crate lazy_static;

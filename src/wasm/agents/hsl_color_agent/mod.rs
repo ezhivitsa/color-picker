@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use yew::agent::{Dispatcher, Agent, Context, AgentLink, Dispatched, HandlerId};
+use yew::agent::{Agent, AgentLink, Context, Dispatched, Dispatcher, HandlerId};
 
 use crate::agents::current_color_agent::{CurrentColorAgent, CurrentColorRequest};
 use crate::libs::color_transform::Color;
@@ -8,7 +8,7 @@ use crate::libs::color_validate;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Request {
-  HslColorChangeMsg(String)
+  HslColorChangeMsg(String),
 }
 
 pub struct HslColorAgent {
@@ -34,7 +34,9 @@ impl Agent for HslColorAgent {
       Request::HslColorChangeMsg(hsl) => {
         if color_validate::is_valid_hsv(&hsl) {
           let color = Color::from_hsl(hsl);
-          self.current_color_dispatcher.send(CurrentColorRequest::UpdateColor(color));
+          self
+            .current_color_dispatcher
+            .send(CurrentColorRequest::UpdateColor(color));
         }
       }
     }

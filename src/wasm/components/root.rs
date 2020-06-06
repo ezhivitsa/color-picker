@@ -1,13 +1,10 @@
-mod color_pallet;
-mod color_slider;
-mod color_value;
-mod values;
-
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
-use color_pallet::ColorPallet;
-use color_slider::ColorSlider;
-use color_value::ColorValue;
+use crate::components::color_pallet::ColorPallet;
+use crate::components::color_slider::ColorSlider;
+use crate::components::color_value::ColorValue;
+
+use crate::components::values;
 
 use crate::texts::TEXTS;
 

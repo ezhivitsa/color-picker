@@ -48,6 +48,9 @@ test-cargo:
 .PHONY: test
 test: lint-styles test-cargo
 
+.PHONY: format
+format: cargo fmt
+
 .PHONY: deploy-gh-pages
 deploy-gh-pages:
 	npx gh-pages -d dist

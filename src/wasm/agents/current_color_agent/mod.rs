@@ -12,7 +12,7 @@ use crate::constants::{MAX_H, MAX_SVL};
 
 #[derive(Serialize, Deserialize)]
 pub enum CurrentColorRequest {
-  UpdateColor(Color)
+  UpdateColor(Color),
 }
 
 #[derive(Serialize, Deserialize)]
