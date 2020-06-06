@@ -1,4 +1,5 @@
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::rgb_color_agent::{RgbColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
@@ -14,14 +15,14 @@ pub enum Msg {
 pub struct RgbValue {
   rgb_value: String,
   link: ComponentLink<RgbValue>,
+  rgb_color_agent: Dispatcher<RgbColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
-  _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl RgbValue {
   fn handle_value_change(&mut self, value: String) {
     self
-      ._current_color_agent
+      .rgb_color_agent
       .send(Request::RgbColorChangeMsg(value));
   }
 }
@@ -33,14 +34,14 @@ impl Component for RgbValue {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let _current_color_agent = CurrentColorAgent::dispatcher();
+    let rgb_color_agent = RgbColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     RgbValue {
       rgb_value: String::from(""),
       link,
+      rgb_color_agent,
       _producer,
-      _current_color_agent,
     }
   }
 

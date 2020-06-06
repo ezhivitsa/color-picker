@@ -1,4 +1,5 @@
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::cmyk_color_agent::{CmykColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
@@ -13,14 +14,14 @@ pub enum Msg {
 pub struct CmykValue {
   cmyk_value: String,
   link: ComponentLink<CmykValue>,
+  cmyk_color_agent: Dispatcher<CmykColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
-  _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl CmykValue {
   fn handle_value_change(&mut self, value: String) {
     self
-      ._current_color_agent
+      .cmyk_color_agent
       .send(Request::CmykColorChangeMsg(value));
   }
 }
@@ -32,14 +33,14 @@ impl Component for CmykValue {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let _current_color_agent = CurrentColorAgent::dispatcher();
+    let cmyk_color_agent = CmykColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     CmykValue {
       cmyk_value: String::from(""),
       link,
+      cmyk_color_agent,
       _producer,
-      _current_color_agent,
     }
   }
 

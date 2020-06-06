@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 pub mod cmyk_color;
 pub mod hex_color;
 pub mod hsl_color;
@@ -10,6 +12,7 @@ use hsl_color::HSL;
 use hsv_color::HSV;
 use rgb_color::RGB;
 
+#[derive(Serialize, Deserialize)]
 pub struct Color {
   hex: Hex,
   hsv: HSV,

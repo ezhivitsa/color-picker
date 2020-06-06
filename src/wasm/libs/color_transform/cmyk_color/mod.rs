@@ -1,7 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use crate::libs::color_transform::rgb_color::RGB;
 
 use crate::constants::{CMYK_REG_EXP, MAX_CMYK, MAX_RGB};
 
+#[derive(Serialize, Deserialize)]
 pub struct CMYK {
   black: f32,
   cyan: f32,

@@ -4,7 +4,8 @@ use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, Should
 
 use pallet_canvas::PalletCanvas;
 
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::hsv_color_agent::{HsvColorAgent, Request};
 use crate::services::mouse::{MouseService, MouseTask};
 
 use crate::constants::{MAX_SVL, MIN_HSV};
@@ -39,7 +40,7 @@ pub struct ColorPallet {
   saturation: f32,
   value: f32,
   link: ComponentLink<ColorPallet>,
-  current_color_agent: Dispatcher<CurrentColorAgent>,
+  hsv_color_agent: Dispatcher<HsvColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   pallet_ref: NodeRef,
   start_data: Option<SliderData>,
@@ -92,8 +93,8 @@ impl ColorPallet {
       value,
     });
     self
-      .current_color_agent
-      .send(Request::CurrentColorMsg(saturation, value));
+      .hsv_color_agent
+      .send(Request::SaturationValueChangedMsg(saturation, value));
   }
 
   fn handle_mouse_move(&mut self, event: MouseEvent) {
@@ -119,8 +120,8 @@ impl ColorPallet {
       let value = (value.max(MIN_HSV)).min(MAX_SVL);
 
       self
-        .current_color_agent
-        .send(Request::CurrentColorMsg(saturation, value));
+        .hsv_color_agent
+        .send(Request::SaturationValueChangedMsg(saturation, value));
     }
   }
 
@@ -136,7 +137,7 @@ impl Component for ColorPallet {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::CurrentColorMessage);
 
-    let current_color_agent = CurrentColorAgent::dispatcher();
+    let hsv_color_agent = HsvColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     let move_callback = link.callback(|e: MouseEvent| Msg::MouseMove(e));
@@ -153,7 +154,7 @@ impl Component for ColorPallet {
       color: String::from(""),
       saturation: 0.0,
       value: 0.0,
-      current_color_agent,
+      hsv_color_agent,
       link,
       pallet_ref: NodeRef::default(),
       start_data: None,

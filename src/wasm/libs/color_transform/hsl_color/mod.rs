@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use crate::constants::{HSV_REG_EXP, MAX_SVL};
 use crate::libs::color_transform::hsv_color::HSV;
 
-lazy_static! {}
-
+#[derive(Serialize, Deserialize)]
 pub struct HSL {
   hue: f32,
   saturation: f32,

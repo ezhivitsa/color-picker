@@ -1,4 +1,5 @@
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::hex_color_agent::{HexColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
@@ -14,14 +15,14 @@ pub struct HexValue {
   hex_value: String,
   last_hex_value: String,
   link: ComponentLink<HexValue>,
+  hex_color_agent: Dispatcher<HexColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
-  _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl HexValue {
   fn handle_value_change(&mut self, value: String) {
     self
-      ._current_color_agent
+      .hex_color_agent
       .send(Request::HexColorChangeMsg(value));
   }
 }
@@ -33,15 +34,15 @@ impl Component for HexValue {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let _current_color_agent = CurrentColorAgent::dispatcher();
+    let hex_color_agent = HexColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     HexValue {
       hex_value: String::from(""),
       last_hex_value: String::from(""),
       link,
+      hex_color_agent,
       _producer,
-      _current_color_agent,
     }
   }
 

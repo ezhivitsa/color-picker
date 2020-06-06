@@ -1,7 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use crate::constants::{HSV_REG_EXP, MAX_RGB, MAX_SVL};
 use crate::libs::color_transform::hsl_color::HSL;
 use crate::libs::color_transform::rgb_color::RGB;
 
+#[derive(Serialize, Deserialize)]
 pub struct HSV {
   hue: f32,
   saturation: f32,

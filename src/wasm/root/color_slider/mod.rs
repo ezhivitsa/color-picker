@@ -2,7 +2,8 @@ use web_sys::{Element, HtmlElement, MouseEvent};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, NodeRef, ShouldRender};
 
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::hsv_color_agent::{HsvColorAgent, Request};
 use crate::services::mouse::{MouseService, MouseTask};
 
 use crate::constants::{MAX_H, MIN_HSV};
@@ -41,7 +42,7 @@ pub struct ColorSlider {
   color: String,
   hue: f32,
   link: ComponentLink<ColorSlider>,
-  current_color_agent: Dispatcher<CurrentColorAgent>,
+  hsv_color_agent: Dispatcher<HsvColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
   start_data: Option<SliderData>,
   _tasks: Tasks,
@@ -71,7 +72,7 @@ impl ColorSlider {
       let hue = start_data.hue + hue_diff;
       let hue = (hue.max(MIN_HSV)).min(MAX_H);
 
-      self.current_color_agent.send(Request::CurrentHueMsg(hue));
+      self.hsv_color_agent.send(Request::HueChangedMsg(hue));
     }
   }
 
@@ -97,7 +98,7 @@ impl ColorSlider {
     let hue = (x - left) as f32 / pallet_width as f32 * MAX_H;
     let hue = hue.round();
 
-    self.current_color_agent.send(Request::CurrentHueMsg(hue));
+    self.hsv_color_agent.send(Request::HueChangedMsg(hue));
     self.start_data = Some(SliderData { start: x, hue });
   }
 }
@@ -109,7 +110,7 @@ impl Component for ColorSlider {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> ColorSlider {
     let callback = link.callback(Msg::CurrentColorMessage);
 
-    let current_color_agent = CurrentColorAgent::dispatcher();
+    let hsv_color_agent = HsvColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     let move_callback = link.callback(|e: MouseEvent| Msg::MouseMove(e));
@@ -126,7 +127,7 @@ impl Component for ColorSlider {
       color: String::from(""),
       hue: 0.0,
       link,
-      current_color_agent,
+      hsv_color_agent,
       _producer,
       _tasks,
       start_data: None,

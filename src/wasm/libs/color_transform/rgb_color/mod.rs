@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::libs::color_transform::cmyk_color::CMYK;
 use crate::libs::color_transform::hex_color::Hex;
 use crate::libs::color_transform::hsv_color::HSV;
@@ -6,6 +8,7 @@ use crate::constants::{
   HEX_LONG_REG_EXP, HEX_SHORT_REG_EXP, MAX_CMYK, MAX_RGB, MAX_SVL, RGB_REG_EXP,
 };
 
+#[derive(Serialize, Deserialize)]
 pub struct RGB {
   red: f32,
   green: f32,

@@ -1,7 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use crate::libs::color_transform::rgb_color::RGB;
 
 use crate::constants::HEX_SHORT_REG_EXP;
 
+#[derive(Serialize, Deserialize)]
 pub struct Hex {
   value: String,
 }

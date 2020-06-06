@@ -1,4 +1,5 @@
-use crate::agents::current_color_agent::{CurrentColorAgent, Request, Response};
+use crate::agents::current_color_agent::{CurrentColorAgent, Response};
+use crate::agents::hsv_color_agent::{HsvColorAgent, Request};
 use yew::agent::{Dispatched, Dispatcher};
 use yew::{html, Bridge, Bridged, Component, ComponentLink, Html, ShouldRender};
 
@@ -13,14 +14,14 @@ pub enum Msg {
 pub struct HsvValue {
   hsv_value: String,
   link: ComponentLink<HsvValue>,
+  hsv_color_agent: Dispatcher<HsvColorAgent>,
   _producer: Box<dyn Bridge<CurrentColorAgent>>,
-  _current_color_agent: Dispatcher<CurrentColorAgent>,
 }
 
 impl HsvValue {
   fn handle_value_change(&mut self, value: String) {
     self
-      ._current_color_agent
+      .hsv_color_agent
       .send(Request::HsvColorChangeMsg(value));
   }
 }
@@ -32,14 +33,14 @@ impl Component for HsvValue {
   fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
     let callback = link.callback(Msg::NewMessage);
 
-    let _current_color_agent = CurrentColorAgent::dispatcher();
+    let hsv_color_agent = HsvColorAgent::dispatcher();
     let _producer = CurrentColorAgent::bridge(callback);
 
     HsvValue {
       hsv_value: String::from(""),
       link,
+      hsv_color_agent,
       _producer,
-      _current_color_agent,
     }
   }
 
