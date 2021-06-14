@@ -16,9 +16,9 @@ module.exports = {
     path: dist,
     filename: '[name].js',
   },
-  devServer: {
-    contentBase: dist,
-    hot: true,
+
+  experiments: {
+    asyncWebAssembly: true
   },
 
   resolve: {

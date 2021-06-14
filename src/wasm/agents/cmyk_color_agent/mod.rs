@@ -16,7 +16,7 @@ pub struct CmykColorAgent {
 }
 
 impl Agent for CmykColorAgent {
-  type Reach = Context;
+  type Reach = Context<Self>;
   type Message = ();
   type Input = Request;
   type Output = ();

@@ -69,7 +69,7 @@ impl Component for CmykValue {
           </span>
           <ColorInput
             class="value-color__input"
-            value={&self.cmyk_value}
+            value={self.cmyk_value.clone()}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>

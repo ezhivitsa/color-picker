@@ -28,7 +28,7 @@ build: build-wasm build-js
 
 .PHONY: webpack-dev
 webpack-dev:
-	npx webpack-dev-server --config webpack.dev.config.js
+	npx webpack serve --config webpack.dev.config.js --liveReload
 
 .PHONY: dev
 dev: clean webpack-dev

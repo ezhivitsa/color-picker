@@ -16,7 +16,7 @@ pub struct HexColorAgent {
 }
 
 impl Agent for HexColorAgent {
-  type Reach = Context;
+  type Reach = Context<Self>;
   type Message = ();
   type Input = Request;
   type Output = ();

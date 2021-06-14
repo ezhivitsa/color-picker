@@ -71,7 +71,7 @@ impl Component for HexValue {
           </span>
           <ColorInput
             class="hex-color__input"
-            value={&self.hex_value}
+            value={self.hex_value.clone()}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>

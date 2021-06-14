@@ -63,7 +63,7 @@ impl CurrentColorAgent {
 }
 
 impl Agent for CurrentColorAgent {
-  type Reach = Context;
+  type Reach = Context<Self>;
   type Message = ();
   type Input = CurrentColorRequest;
   type Output = Response;

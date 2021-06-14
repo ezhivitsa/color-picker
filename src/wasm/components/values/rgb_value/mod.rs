@@ -68,7 +68,7 @@ impl Component for RgbValue {
           </span>
           <ColorInput
             class="value-color__input"
-            value={&self.rgb_value}
+            value={self.rgb_value.clone()}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>

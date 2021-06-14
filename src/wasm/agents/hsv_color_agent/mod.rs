@@ -26,7 +26,7 @@ pub struct HsvColorAgent {
 }
 
 impl Agent for HsvColorAgent {
-  type Reach = Context;
+  type Reach = Context<Self>;
   type Message = Msg;
   type Input = Request;
   type Output = ();

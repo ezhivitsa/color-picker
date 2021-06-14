@@ -16,7 +16,7 @@ pub struct RgbColorAgent {
 }
 
 impl Agent for RgbColorAgent {
-  type Reach = Context;
+  type Reach = Context<Self>;
   type Message = ();
   type Input = Request;
   type Output = ();

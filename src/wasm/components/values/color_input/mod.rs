@@ -76,7 +76,7 @@ impl Component for ColorInput {
     html! {
       <input
         class={&self.class}
-        value={&self.value}
+        value={self.value.clone()}
         oninput=self.link.callback(|e: InputData| Msg::ValueChanged(e))
         onfocus={self.link.callback(|_: FocusEvent| Msg::Focus)}
         onblur={self.link.callback(|_: FocusEvent| Msg::Blur)}

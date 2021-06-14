@@ -18,6 +18,10 @@ module.exports = {
     publicPath: `/${publicPath}`,
   },
 
+  experiments: {
+    asyncWebAssembly: true
+  },
+
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.jsx'],

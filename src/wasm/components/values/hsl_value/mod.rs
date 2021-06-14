@@ -67,7 +67,7 @@ impl Component for HslValue {
           </span>
           <ColorInput
             class="value-color__input"
-            value={&self.hsl_value}
+            value={self.hsl_value.clone()}
             on_change={self.link.callback(|value: String| Msg::ValueChanged(value))}
           />
         </div>
