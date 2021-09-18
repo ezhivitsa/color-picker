@@ -11,7 +11,7 @@ clean: clean-dist clean-pkg
 
 .PHONY: build-wasm-pack
 build-wasm-pack:
-	wasm-pack build --release --out-dir pkg
+	wasm-pack build --release --out-dir pkg --target web --mode normal
 
 .PHONY: build-wasm
 build-wasm: clean-pkg build-wasm-pack
@@ -28,14 +28,14 @@ build: build-wasm build-js
 
 .PHONY: webpack-dev
 webpack-dev:
-	npx webpack serve --config webpack.dev.config.js --liveReload
+	npx webpack serve --config webpack.dev.config.js
 
 .PHONY: dev
 dev: clean webpack-dev
 
 .PHONY: deps
 deps:
-	npm ci
+	yarn
 
 .PHONY: lint-styles
 lint-styles:

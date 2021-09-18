@@ -1,3 +1,8 @@
 import './styles/global.pcss';
 
-import('../../pkg/color_picker')
+async function initColorPicker() {
+  const { default: init } = await import('../../pkg/color_picker');
+  init();
+}
+
+initColorPicker();

@@ -14,7 +14,7 @@ module.exports = {
   output: {
     path: dist,
     filename: '[name].js',
-    chunkFilename: '[name].chunk.js',
+    chunkFilename: '[name].chunk.[chunkhash].js',
     publicPath: `/${publicPath}`,
   },
 
@@ -38,9 +38,6 @@ module.exports = {
           MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
-            options: {
-              importLoaders: 1
-            },
           },
           'postcss-loader',
         ],
@@ -53,8 +50,8 @@ module.exports = {
       template: './src/client/index.html',
     }),
     new MiniCssExtractPlugin({
-      filename: 'main.[hash].css',
-      chunkFilename: 'main.[id].[hash].css',
+      filename: 'main.[fullhash].css',
+      chunkFilename: 'main.[id].[chunkhash].css',
     }),
   ],
 };

@@ -3,6 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 
+const port = process.env.PORT || 8080;
 const dist = path.resolve(__dirname, 'dist');
 
 module.exports = {
@@ -15,6 +16,19 @@ module.exports = {
   output: {
     path: dist,
     filename: '[name].js',
+  },
+
+  devServer: {
+    hot: true,
+    port,
+    allowedHosts: 'all',
+    static: {
+      directory: path.join(__dirname, 'pkg'),
+      watch: {
+        aggregateTimeout: 300,
+        poll: 100,
+      },
+    },
   },
 
   experiments: {
@@ -38,10 +52,15 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1
+              sourceMap: true
             },
           },
-          'postcss-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
         ],
       },
     ],
@@ -55,6 +74,7 @@ module.exports = {
       crateDirectory: __dirname,
       outName: 'color_picker',
       outDir: 'pkg',
+      extraArgs: '--target web --mode normal',
     }),
   ],
 };
