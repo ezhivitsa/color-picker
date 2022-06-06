@@ -17,7 +17,7 @@ path = "src/wasm/lib.rs"
 [dependencies]
 yew = { version = "0.18.0", features = ["web_sys"] }
 serde = "1.0.130"
-regex = "1.5.4"
+regex = "1.5.5"
 lazy_static = "1.4.0"
 rand = { version = "0.7.3", features = ["wasm-bindgen"] }
 gloo = "0.3.0"
